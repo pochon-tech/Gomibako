@@ -5,7 +5,6 @@ x-logging:
   options:
     max-size: "100k"
     max-file: "3"
-volumes:
 services:
 
   php:

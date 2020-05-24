@@ -5,4 +5,5 @@ require_once __DIR__.'/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-echo getenv('HTTP_TCP_SOCK_DEV');
+$test = "hello";
+echo "$test, PHP";

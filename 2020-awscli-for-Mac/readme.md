@@ -1,6 +1,6 @@
 ## 概要
 
-AWS + Lambda + PHP
+Mac + AwsCLI 
 
 ## 作業
 
@@ -10,7 +10,7 @@ $ git clone https://github.com/pochon-tech/Try.git
 $ cd Try; 2020-PHP-Lamda;
 ```
 
-- AWS CLIのインストール (まだない場合)
+- AWS CLIのインストール
 ```sh:
 # VSCODE上でターミナルを開く（Mac）[control] + [shift] + [^]
 # pip3推奨

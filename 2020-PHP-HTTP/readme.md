@@ -37,3 +37,5 @@ export HTTP_TCP_SOCK_DEV='localhost:8000'
     - TCPはこのストリーム型通信を提供する。
     - コネクションが確立された時点で通信しようとする ポート に相手が存在することが確認されており、相手が受け取る準備ができていることが保証される。
 - `stream_socket_accept($server_socket)`: `stream_socket_server` で作られたソケットの接続を受け入れる。受け付けたソケット接続へのストリームを返す。
+- `stream_socket_client($remote_socket, $errno, $errstr, $timeout)`: remote_socket で指定された接続先との、 ストリームまたはデータグラム接続を確立する。
+  - `remote_socket`: 接続するソケットのアドレス。

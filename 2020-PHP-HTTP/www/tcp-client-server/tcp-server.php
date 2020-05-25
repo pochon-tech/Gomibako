@@ -15,10 +15,10 @@ if (!$socket) {
     echo "message: $errstr\n";
     exit(1);
 }
-echo "Listening TCP connection on $conf...\n";
+echo "Listening TCP connection on $local_socket...\n";
 
 // TCPクライアントソケットを受け入れる
-while($conn = stream_socket_accept($socket, -1)) {
+while($con = stream_socket_accept($socket, -1)) {
     for ($i = 0; $i < 3; ++$i) {
         $msg = "Hello $i !!\n";
         echo "Server Sent: $msg";

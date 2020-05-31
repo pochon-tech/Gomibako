@@ -59,5 +59,6 @@ $ cp ../tcp-client-server/exec.sh exec.sh
 - `declare`: `declare (命令)`。あるコードブロックの中に 実行ディレクティブ（実行命令）をセットするために使用される。使用できるディレクティブは、`ticks`,`encoding`,`strict_types`。
   - `ticks`: declareブロックの実行中にパーサが N個の低レベル tick 可能な文を実行するごとに 発生するイベントのこと。
     - すべての文が tick 可能なわけではない。たとえば条件式や引数式などは tick できない。
-
+- `pcntl_waitpid($pid, &$status, options )`: 待つかフォークした子プロセスのステータスを返す
+  - `$pid`: -1ならば全ての子プロセスを待つ。
 

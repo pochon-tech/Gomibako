@@ -39,3 +39,25 @@ export HTTP_TCP_SOCK_DEV='localhost:8000'
 - `stream_socket_accept($server_socket)`: `stream_socket_server` で作られたソケットの接続を受け入れる。受け付けたソケット接続へのストリームを返す。
 - `stream_socket_client($remote_socket, $errno, $errstr, $timeout)`: remote_socket で指定された接続先との、 ストリームまたはデータグラム接続を確立する。
   - `remote_socket`: 接続するソケットのアドレス。
+
+### .www/multi-tcp-client-server
+
+- 引き続き、TCPでの通信
+- 同時処理を行えるようにする。
+```sh:
+$ docker-compose exec php bash
+$ cd multi-tcp-client-server
+$ composer init
+$ vi .env
+$ cp ../tcp-client-server/exec.sh exec.sh 
+```
+
+- `pcntl_signal($signo, $handler)`: $signo が指すシグナルに関するハンドラを新たに設定するか、既存のハンドラを置き換える。
+  - `pcntl_signal`を使用する際は、必ず`declare(ticks = 1);`を定義する必要がある。
+  - `signo`: シグナル番号。
+  - `handler`: シグナルハンドラ。callableを渡すと、それを実行してシグナルを処理する。シグナルハンドラの引数には必ずシグナル番号が必要。
+- `declare`: `declare (命令)`。あるコードブロックの中に 実行ディレクティブ（実行命令）をセットするために使用される。使用できるディレクティブは、`ticks`,`encoding`,`strict_types`。
+  - `ticks`: declareブロックの実行中にパーサが N個の低レベル tick 可能な文を実行するごとに 発生するイベントのこと。
+    - すべての文が tick 可能なわけではない。たとえば条件式や引数式などは tick できない。
+
+

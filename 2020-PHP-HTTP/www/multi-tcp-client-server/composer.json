@@ -1,0 +1,6 @@
+{
+    "name": "root/multi-tcp-client-server",
+    "require": {
+        "vlucas/phpdotenv": "^4.1"
+    }
+}

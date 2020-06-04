@@ -38,3 +38,59 @@ var_dump(orderBy(
 ));
 
 
+//Example with StdClass
+$json = '{ "foo": "bar", "number": 42 }';
+$stdInstance = json_decode($json);
+echo $stdInstance->foo . PHP_EOL; //"bar"
+echo $stdInstance->number . PHP_EOL; //42
+//Example with associative array
+$array = json_decode($json, true); // 第２引数をtrueにすると返されるオブジェクトは連想配列形式
+echo $array['foo'] . PHP_EOL; //"bar"
+echo $array['number'] . PHP_EOL; //42
+// オブジェクト配列形式のJSONもデコード可能
+$json2 = '
+{
+    "res":
+    {
+        "blogData":
+        [
+            {
+                "id":"0001",
+                "title":"サンプル01",
+                "day":
+                [
+                    {
+                        "year":"2015",
+                        "month":"03",
+                        "_day":"31"
+                    }
+                ],
+                "author":"fantmsite",
+                "tag":
+                [
+                    "ブログ"
+                ],
+                "report":"ブログ内容サンプル01"
+            },
+            {
+                "id":"0002",
+                "title":"サンプル02",
+                "day":
+                [
+                    {
+                        "year":"2015",
+                        "month":"04",
+                        "_day":"01"
+                    }
+                ],
+                "author":"fantmsite",
+                "tag":
+                [
+                    "ブログ"
+                ],
+                "report":"ブログ内容サンプル02"
+            }
+        ]
+    }
+}';
+var_dump(json_decode($json2));

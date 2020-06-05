@@ -9,6 +9,7 @@
     "ttypescript": "^1.5.10"
   },
   "dependencies": {
+    "csv": "^5.3.2",
     "node-html-parser": "^1.2.18"
   }
 }

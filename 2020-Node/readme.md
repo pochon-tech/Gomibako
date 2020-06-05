@@ -16,6 +16,7 @@ mkdir html; vi html/index.html;
 </html>
 yarn init
 yarn add ttypescript @types/node ts-node -D
+yarn add csv
 tsc --init
 vi convert.ts
 ```

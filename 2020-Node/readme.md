@@ -19,6 +19,3 @@ yarn add ttypescript @types/node ts-node -D
 tsc --init
 vi convert.ts
 ```
-
-**htmlパーサー**
-- `node-html-parser`

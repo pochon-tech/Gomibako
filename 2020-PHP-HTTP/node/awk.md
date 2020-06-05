@@ -96,3 +96,25 @@ awk 'BEGIN { print "==BEGIN==" } { print $0} END { print "==END==" }' sample.dat
 3 30 300
 ==END==
 ```
+
+- awkスクリプトファイルを読み込む
+```sh:
+vi sample.awk
+#!/usr/bin/awk -f
+{
+    # all record output
+    print $0;
+}
+$ awk -f sample.awk sample.dat
+1 10 100
+2 20 200
+3 30 300
+# chmod +x sample.awk のように実行権限を付与してあげれば、ファイルからの実行も可能
+$ ./sample.awk sample.dat
+1 10 100
+2 20 200
+3 30 300
+# 複数ファイルも指定可能
+$ cp sample.dat sample2.dat
+$ ./sample.awk sample.dat sample2.dat
+```

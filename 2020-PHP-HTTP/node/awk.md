@@ -82,3 +82,17 @@ $ awk '/2/ { print $0 }' sample.dat
 $ awk '/100$/ { print $0 }' sample.dat
 1 10 100
 ```
+
+- BEGINとEND
+- `awk 'BEGIN { 最初の行を読み込む前の処理 } { メイン処理 } END { 最後の行を読み込んだ後の処理 }'`
+```sh:
+# BEGIN: 最初の行が読み込まれる前に処理を実行
+# END:   最後の行が読み込まれた後に処理を実行
+# 一番最初の行と、一番最後の行に文字を表示する。
+awk 'BEGIN { print "==BEGIN==" } { print $0} END { print "==END==" }' sample.dat 
+==BEGIN==
+1 10 100
+2 20 200
+3 30 300
+==END==
+```

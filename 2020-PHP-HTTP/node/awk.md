@@ -2,14 +2,13 @@
 - http://sweng.web.fc2.com/ja/program/awk/quick-start.html
 
 **準備**
-`docker-compose exec node sh`
+- `docker-compose exec node sh`
 
 **構文**
-`$ awk '{ awkのコード }' ファイル名`
+- `$ awk '{ awkのコード }' ファイル名`
 
 **練習**
 - ファイル内容出力
-
 ```sh:
 $ vi sample.dat
 1 10 100
@@ -28,4 +27,36 @@ $ awk '{ print $1","$2","$3; }' sample.dat
 1,10,100
 2,20,200
 3,30,300
+```
+
+- 計算結果の出力
+```sh:
+$ awk '{ print "+: "$1+$2+$3; print "-: "$3-$2-$1; print "*: "$1*$2*$3; print "/: "$3/$2/$1 }' sample.dat 
++: 111
+-: 89
+*: 1000
+/: 10
++: 222
+-: 178
+*: 8000
+/: 5
++: 333
+-: 267
+*: 27000
+/: 3.33333
+# 小数点の桁数を指定して出力
+$ awk '{ printf "%.6f\n", $1 }' sample.dat
+1.000000
+2.000000
+3.000000
+# 余り計算
+$ awk '{ print $2%3 }' sample.dat 
+1 # 10 % 3 = 3...1
+2 # 20 % 3 = 6...2
+0 # 30 % 3 = 10...0
+# 変数に格納
+$ awk '{ sum = $1+$2+$3; print sum} ' sample.dat
+111
+222
+333
 ```

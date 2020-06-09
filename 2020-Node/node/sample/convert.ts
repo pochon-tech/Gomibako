@@ -10,6 +10,17 @@ const exportCSV = (arr: string[]) => {
     fs.writeFile(__dirname + 'formList.csv', formatCSV, 'utf8', (err) => {})
 }
 
+const readFile = (filePath: string): string[] => {
+    try {
+        const data = fs.readFileSync(filePath, 'utf-8')
+        const list: string[]| null = data.match(/(({{)(\s*\$t\()(.*)(\)\s*}}))/g)
+        return list ? list.map(item => { return item.replace(/^{{\s*/, '').replace(/\$t\(("|')/, '').replace(/("|')\)\s*}}$/, '') }) : []
+    }catch (e) {
+        console.log(e)
+        return []
+    }
+}
+
 const searchFiles = (dirPath: string, extPattern: string) => {
     const pattern = dirPath+extPattern
     // glob(pattern, (err: Error | null, files: string[]) => {
@@ -18,23 +29,20 @@ const searchFiles = (dirPath: string, extPattern: string) => {
     // })
     try {
         const files = glob.sync(pattern)
-        console.log(files)
-        return files.length ? files.map(file=> path.basename(file)) : []
+        return files.length ? files : []
+        // return files.length ? files.map(file=> path.basename(file)) : []
     } catch (e) {
         console.log(e)
+        return []
     }
 }
 
 const main = (): void => {
-    searchFiles(__dirname + "/html", "**/*.html")
-    fs.readFile(__dirname + "/html/index.html",{ encoding: 'utf8' }, (err, data) => {
-        const list: string[]| null = data.match(/(({{)(\s*\$t\()(.*)(\)\s*}}))/g)
-        const list2: string[] = list ? list.map(item => {
-            return item.replace(/^{{\s*/, '').replace(/\$t\(("|')/, '').replace(/("|')\)\s*}}$/, '')
-        }) : []
-        console.log(list2)
-        exportCSV(list2)
-    })   
+    const fileList: string[] = searchFiles(__dirname + "/html", "**/*.html")
+    let exportList: string[] = []
+    for (let file of fileList) {
+        exportList = exportList.concat(readFile(file))
+    }
+    exportCSV(exportList)
 }
-
 main()

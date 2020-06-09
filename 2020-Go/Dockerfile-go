@@ -1,0 +1,15 @@
+FROM golang:latest
+  
+ENV APP_PORT 8003
+ENV APP_ROOT /go/src
+EXPOSE $APP_PORT
+WORKDIR $APP_ROOT
+
+# ベースとなるDockerイメージ指定
+# FROM golang:latest
+# コンテナ内に作業ディレクトリを作成
+# RUN mkdir /go/src/work
+# コンテナログイン時のディレクトリ指定
+# WORKDIR /go/src
+# ホストのファイルをコンテナの作業ディレクトリに移行
+# ADD . /go/src/

@@ -15,3 +15,7 @@ $ go run main.go
 # もしくは docker-compose exec Service Command
 $ docker-compose exec go go run main.go
 ```
+
+**HTTPサーバ立てる**
+- `net/http`パッケージを使用する。
+  - HTTPクライアントとHTTPサーバーを実装するために必要な機能が提供されている。

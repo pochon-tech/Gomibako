@@ -19,7 +19,18 @@ func main() {
 
     // パラメータ受け取り
 	http.HandleFunc("/request-params", handleParams)
-	
+
+    // 静的ファイル配信.
+    // ディレクトリ名をURLパスに使う場合
+    // 例：http://localhost:8080/contents/sample1.txt
+    http.Handle("/contents/", http.FileServer(http.Dir("./")))
+
+    // 静的ファイル配信.
+    // ディレクトリ名とURLパスを変える場合
+    // 例：http://localhost:8080/mysecret/sample1.txt
+    http.Handle("/mysecret/", http.StripPrefix("/mysecret/", http.FileServer(http.Dir("./contents"))))
+
+
     http.ListenAndServe(":8003", nil)
 }
 

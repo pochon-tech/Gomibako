@@ -28,4 +28,6 @@ $ docker-compose exec go go run main.go
   - ダッグタイピングを生かした実装方法。
   - `ServeHTTP(w http.ResponseWriter, r *http.Request)`という関数を持った構造体を`http.Handleの第2引数`に渡すことで、リクエストを処理。
   - `http.HandleFunc`と`http.Handle`の違いは、第2引数に指定できる形式が異なる
-  
+
+**POST処理の実装**
+- 特定のHTTPメソッドのみに対応したい場合、頑張る。

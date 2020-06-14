@@ -12,7 +12,10 @@ func main() {
 	http.HandleFunc("/hoge", handler)
 
     // DuckTyping的に、ServeHTTP関数があれば良い.
-    http.Handle("/fuga", String("Duck Typing!!!"))
+	http.Handle("/fuga", String("Duck Typing!!!"))
+	
+	// POSTメソッドのみ許可する
+	http.HandleFunc("/only-post", postHandler)
 
     http.ListenAndServe(":8003", nil)
 }
@@ -30,3 +33,13 @@ func (s String) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     fmt.Fprint(w, s)
 }
 
+// post処理のみkyok
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	// HTTPメソッドをチェック（POSTのみ許可）
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed) // 405
+		w.Write([]byte("POST ONLY"))
+		return
+	}
+	w.Write([]byte("OK"))
+}

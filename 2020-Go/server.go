@@ -17,6 +17,9 @@ func main() {
 	// POSTメソッドのみ許可する
 	http.HandleFunc("/only-post", postHandler)
 
+    // パラメータ受け取り
+	http.HandleFunc("/request-params", handleParams)
+	
     http.ListenAndServe(":8003", nil)
 }
 
@@ -42,4 +45,21 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte("OK"))
+}
+
+func handleParams(w http.ResponseWriter, r *http.Request) {
+
+    // クエリパラメータ取得してみる
+    fmt.Fprintf(w, "query:%s\n", r.URL.RawQuery)
+
+    // Bodyデータを扱う場合には、事前にパースを行う
+    r.ParseForm()
+
+    // Formデータを取得. := で var指定いらない
+    form := r.PostForm
+    fmt.Fprintf(w, "form1:\n%v\n", form)
+
+    // または、クエリパラメータも含めて全部. := で var指定いらない
+    params := r.Form
+    fmt.Fprintf(w, "form2:\n%v\n", params)
 }

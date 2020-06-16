@@ -95,6 +95,9 @@
                     <a href="https://github.com/laravel/laravel">GitHub</a>
                 </div>
             </div>
+
+            <div id="example"></div>
+            <script src="{{mix('js/app.js')}}" ></script>
         </div>
     </body>
 </html>

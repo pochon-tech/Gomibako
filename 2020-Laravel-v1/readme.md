@@ -52,3 +52,22 @@ $ npm run dev # build
 $ npm run dev
 ```
 
+### phpDocumentorのインストール
+- `composer require --dev phpdocumentor/phpdocumentor` だとうまくいかない。
+- pharを使う
+```sh:
+apt-get install wget
+cd vendor/bin
+wget http://phpdoc.org/phpDocumentor.phar
+```
+- 【使用方法】
+- ディレクトリ単位：`php vendor/bin/phpDocumentor.phar -d app -t public/phpdoc`
+- ファイル単位：`php vendor/bin/phpDocumentor.phar -f app/Http/Controllers/UserController.php -t public/phpdoc`
+
+### ユーザ機能をDDD風にする
+
+- **コントローラー**
+- リクエストを受け取りドメインサービスに投げる。
+- バリデーションはフォームリクエストに委ねる
+- 雛形の作成：`php artisan make:controller コントローラ名`
+- 画面繊維は、一覧画面 → 登録画面 → 一覧画面 を想定

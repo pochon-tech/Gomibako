@@ -10,7 +10,9 @@ brew list | grep git # ないこと確認
 brew info git | grep stable
 brew install git
 brew list | grep git # あること確認
-# credential-osxkeychain について要調査。
+# PUSHすると、credential-osxkeychain発生: windowsとは異なり、資格情報は別途保存する必要がありそうだ。
+# 初めてのPUSH時はGithubのUSERとPASSを入力
+
 ```
 
 ### Laravel 準備

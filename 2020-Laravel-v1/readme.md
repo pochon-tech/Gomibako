@@ -71,3 +71,11 @@ wget http://phpdoc.org/phpDocumentor.phar
 - バリデーションはフォームリクエストに委ねる
 - 雛形の作成：`php artisan make:controller コントローラ名`
 - 画面繊維は、一覧画面 → 登録画面 → 一覧画面 を想定
+
+- **入力データのバリデート**
+- 値オブジェクトとしてのふるまいにするか、LaravelWayなフォームリクエストで確認するかで悩んだ。
+- FormRequest: ValidationをControllerのMethodから切り離し、Validation専用のファイルを作り処理をさせる。
+- 通常ControllerのStoreメソッド等でValidationを行ったりするが、肥大化を防止できる
+- `php artisan make:request ファイル名`で雛形を生成可能
+- 小技として、文字数許可範囲はValueObjectを参照させる。
+

@@ -98,3 +98,13 @@ wget http://phpdoc.org/phpDocumentor.phar
 - `php artisan make:request ファイル名`で雛形を生成可能
 - 小技として、文字数許可範囲はValueObjectを参照させる。
 
+- **ValueObject**
+- ユーザの属性を定義。
+- エンティティの生成時に誤設定を回避。
+- interfaceの作成: 
+  - `mkdir app/ValueObjects; touch app/ValueObjects/BaseValueObject.php;`
+- 実装:
+  - `mkdir app/ValueObjects/User`
+  - `touch app/ValueObjects/User/Email.php`
+  - `touch app/ValueObjects/User/Name.php`
+  - `touch app/ValueObjects/User/Password.php`

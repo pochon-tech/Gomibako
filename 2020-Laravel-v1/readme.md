@@ -1,5 +1,17 @@
 # Laravel-Sample-1
 
+### etc git
+```sh:
+# contriのため
+git config --global user.name ''
+git config --global user.email ''
+# 更新
+brew list | grep git # ないこと確認
+brew info git | grep stable
+brew install git
+brew list | grep git # あること確認
+```
+
 ### Laravel 準備
 
 ```sh:

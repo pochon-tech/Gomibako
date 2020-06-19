@@ -79,4 +79,3 @@ wget http://phpdoc.org/phpDocumentor.phar
 - `php artisan make:request ファイル名`で雛形を生成可能
 - 小技として、文字数許可範囲はValueObjectを参照させる。
 
-

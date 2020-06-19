@@ -13,6 +13,10 @@ brew list | grep git # あること確認
 # PUSHすると、credential-osxkeychain発生: windowsとは異なり、資格情報は別途保存する必要がありそうだ。
 # 初めてのPUSH時はGithubのUSERとPASSを入力
 
+# 過去のコミットのAuthorとCommiterの変更
+$ git filter-branch -f --env-filter "GIT_AUTHOR_NAME=''; GIT_AUTHOR_EMAIL=''; GIT_COMMITTER_NAME=''; GIT_COMMITTER_EMAIL='';" HEAD 
+# すでにプッシュしてしまっているなら、-f が必要になる
+$ git push -f origin
 ```
 
 ### Laravel 準備

@@ -10,6 +10,7 @@ brew list | grep git # ないこと確認
 brew info git | grep stable
 brew install git
 brew list | grep git # あること確認
+# credential-osxkeychain について要調査。
 ```
 
 ### Laravel 準備

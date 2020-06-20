@@ -109,6 +109,11 @@ wget http://phpdoc.org/phpDocumentor.phar
   - `touch app/ValueObjects/User/Name.php`
   - `touch app/ValueObjects/User/Password.php`
 
+**サービス**
+- リポジトリへのアクセスやビジネスロジックのやりとりを記述
+- 実装
+  - `mkdir app/Services; touch app/Services/UserService.php`
+
 ### Tips
 
 <details><summary>サービスコンテナ復習</summary>
@@ -200,3 +205,99 @@ wget http://phpdoc.org/phpDocumentor.phar
 - アプリケーション全体で使うインスタンス: サービスプロバイダ
 
 </details>
+
+<details><summary>結合復習</summary>
+
+**結合とは**
+- 基本形: `app()->bind( $abstract, $concrete );`
+- 記述する場所はどこでも問題ないが、`AppServiceProvider`が無難。
+- `AppServiceProvider`の`boot`メソッドでも`register`メソッドでもどちらでも問題ない。
+  - `boot`と`register`の違いは実行されるタイミング
+  - 先に`register`メソッドが実行される。すべてのServiceProviderのregisterが終わった後に、`boot`メソッドが実行される。
+  - 使い分けとしては、**他のServiceのインスタンスを使いたい**場合は、`boot`、**独立した初期化**の場合は`register`に記述する。
+- `$abstract`, `$concrete` がわかりづらいが要は、`$label`, `$service`という感じ。
+  - $abstract: 抽象。ラベルである、サービスコンテナに入れるものにはそれぞれラベルを貼り付ける。ラベルなので文字列。ユニーク。
+  ```php:
+    // 預ける Labelはなんでも良い。
+    app()->bind('date', $concrete1);
+    app()->bind('App\User', $concrete2);
+    app()->bind( MyClass::class, $concrete3); // ::class で完全なクラス名を取得する (https://stackoverflow.com/questions/35378270/myclassclass-get-string-representation-of-myclass)
+    // 取り出す
+    app()->bind('date'); // concrete1
+    app()->bind('App\User'); // concrete2
+    app()->bind(MyClass::class); // concrete3
+  ```
+  - $concrete: 具象。文字列（クラス名）かクロージャ。
+  - クラス名が指定されていると、サービスコンテナはそのクラスをnewして、インスタンスを返す。
+  ```php:
+    // 預ける
+    app()->bind('StdClass', 'StdClass');
+    // 取り出す
+    $a = app('StdClass');
+    var_dump($a);
+    //>>> class stdClass#2911 (0) {
+    //>>> }
+  ```
+  - ちなみに、取り出すたびにインスタンスは新しく生成される。シングルトンではない。
+  ```php:
+    app()->bind('StdClass', 'StdClass');
+    $a = app('StdClass'); spl_object_hash($a);
+    //>>> "000000007dc70f4a0000000054e8bfb6"
+    $a = app('StdClass'); spl_object_hash($a);
+    //>>> "000000007dc70f7e0000000054e8bfb6"
+  ```
+  - さらに、具象自体は省略可能である。その場合、抽象と同じ文字列名が使用される。
+  ```php:
+    // 2つとも同じ。
+    app()->bind('StdClass', 'StdClass');
+    app()->bind('StdClass');
+  ```
+  - シングルトンの表現方法を振り返る。
+  ```php:
+      // 2つとも同じ。
+    app()->singleton('App\MyClass');
+    app()->singleton('App\MyClass','App\MyClass');
+  ```
+  - さらに、シングルトンはbindで置き換えることが可能
+  ```php:
+    app()->singleton('App\MyClass','App\MyClass');
+    app()->bind     ('App\MyClass','App\MyClass', true);
+  ```
+  - bindの第3引数のshareモード。「newするのは最初の1回だけで、次からは生成済みのインスタンスを返す」
+  ```php:
+    app()->bind('std','stdClass',true);
+
+    $s = app('std'); spl_object_hash($s); //>>> "000000002fa3c3390000000018649e8a"
+    $s = app('std'); spl_object_hash($s); //>>> "000000002fa3c3390000000018649e8a"
+
+    // シングルトンなので、オブジェクトを変更して、別のところで再取得しても反映されている。
+    $s->sample = "sample";
+    $s2 = app('std'); 
+    echo $s2->sample; //>>> "sample"
+  ```
+  - 具象をクロージャで定義する場合、返せるものだったら何でも良い。
+  ```php:
+    app()->bind( 'DateTime', function(){ return new DateTime; } );
+    echo app( 'DateTime' )->format('Y-m-d'); //>>> 2019-03-20
+    // より具体的に実装しても問題ない
+    app()->bind( 'birthday', function(){ return new DateTime('1991/04/29'); } );
+    echo app( 'birthday' )->format('Y-m-d'); //>>> 1991-04-29
+    app()->bind( 'fourty-two', function(){ return 42; } );
+    echo app( 'fourty-two' ); //>>> 42
+    // 生成済のインスタンスを預けてみる
+    $instance = new DateTime('2019/02/10');
+    app()->bind( 'some-date', function() use ($instance) { return $instance; } );
+    echo app( 'some-date' )->format('Y-m-d'); //>>> 2019-02-10
+  ```
+
+**まとめ**
+```php:
+// 入れる
+app()->bind( $label, 'ClassName' );
+app()->bind( $label, function(){ return $anything; } );
+
+// 出す
+app( $label );
+```
+</details>
+

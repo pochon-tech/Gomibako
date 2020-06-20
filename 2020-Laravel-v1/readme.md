@@ -301,3 +301,53 @@ app( $label );
 ```
 </details>
 
+<details><summary>結合の使い所</summary>
+
+**固定値で初期化を行う (よく見かける)**
+- 例えばRedisのクライアントクラス。
+- サーバ情報等の特定値を初期設定したいとき。初期化するクラスにその設定値を指定してシングルトンとして登録する。
+- ちなみに、特定値は.envではなくconfig()ヘルパーを使うようにすると良い。
+  - https://github.com/laravel/framework/blob/197a7c3b86d24b8698c61107263b68cb737d51c8/src/Illuminate/Foundation/Bootstrap/LoadEnvironmentVariables.php#L12-L31
+  - .envファイルを読み込む箇所のソースコードを確認すればわかるが、**`.env`ファイルの読み込みは、`php artisan config:cache`をしていない場合にしか読み込まれない**
+  - キャッシュを有効にしている場合、.envに書いているだけで、「シェルから起動する時点で定義されていない環境変数はすべて未定義」になってしまう。
+```php:
+// AppServiceProvider.php
+$this->app()->singleton(\Predis\Client::class, function(app){
+    return new \Predis\Client(
+        [
+            'scheme' => config('database.redis.default.scheme', 'tcp'),
+            'host'   => config('database.redis.default.host', '127.0.0.1'),
+            'port'   => config('database.redis.default.port', 6379),
+        ],
+        [
+            'parameters' => [
+                'password' => config('database.redis.default.password', null),
+                'database' => config('database.redis.default.database', 0),
+            ],
+        ]
+    )
+});
+
+// 上記を使用する箇所
+$client = app(\Predis\Client::class);
+```
+
+**インタフェースから実装クラス**
+- 例えば、`laravel/bootstrap/app.php`でも使用しているパターン。
+- 一般的に、クラスはインタフェースと分けて実装したほうがよい。**機能を使いたいクラスからは提供側のinterfaceを参照する**のが望ましい。
+- 結合を定義しておくことで、実際に動かすときに、そのインターフェースを実装したクラスを注入する
+```php:
+// AppServiceProvider.php
+$this->app->singleton(\App\ProductInterface::class, \App\Product::class);
+$this->app->bind(\App\SearchConditionInterface::class, \App\SearchCondition::class);
+
+// 機能を使う側のクラスの書き方
+class MyClass 
+{
+  // コンストラクタインジェクション
+  public function __construct( \App\ProductInterface $productService )
+  {
+      $productService->... // \App\Product のインスタンスが注入される
+```
+
+</details>

@@ -108,3 +108,48 @@ wget http://phpdoc.org/phpDocumentor.phar
   - `touch app/ValueObjects/User/Email.php`
   - `touch app/ValueObjects/User/Name.php`
   - `touch app/ValueObjects/User/Password.php`
+
+### Tips
+
+<details><summary>サービスコンテナ復習</summary>
+
+**サービスコンテナとは**
+- サービスコンテナ = **インスタンスを自動的に生成してくれる**(new の機能を拡張したようなもの)
+
+**サービスコンテナを利用するには**
+- サービス化したいクラスを作る
+- (サービスプロバイダを作ってapp.phpに登録)
+- (registerにインスタンス化する方法を定義)
+- (bootでサービス同士の依存解決)
+- (ファサード定義してapp.phpに登録)
+- サービスコンテナにインスタンスを提供してもらう
+- ()は省略可能
+
+**サービスプロバイダ**
+- サービスコンテナとは**無関係**
+- 名前が似ているだけ
+
+**サービスコンテナ**
+- クラスのインスタンスを生成・預かってくれる
+
+**サービスコンテナにクラスのインスタンスを作ってもらうには**
+- 一般的なPHPの場合
+  - `$sampleobject = new App\SampleClass;`
+- Laravelのサービスコンテナの場合
+  - `$sampleobject = app()->make('App\SampleClass');`
+- app()->make()はどこでも使用でき、このコードを使用するための準備は不要。
+  - app()はグローバル関数として定義されているので、Laravelアプリならクラスの中でも外でも、いつでもどこでも呼ぶことができる。
+  - 呼ぶと、サービスコンテナが出てくる。つまり、app() = サービスコンテナ。
+  - 準備もいらない。サービスプロバイダに登録するとかもいらない。クラスがきちんと定義(new でインスタンスできる状態)されているならすぐ実行できる。
+  - (new SampleClass) でもよいし app()->make(SampleClass) でもよい。
+  - 他にも書き方がある。
+  ```php:
+    $sampleobject = app()->make('App\SampleClass'); // コンテナがインスタンスを作る
+    $sampleobject = Illuminate\Container\Container::getInstance()->make('App\SampleClass'); // コンテナを取ってきてインスタンスを作る
+    $sampleobject = app()->resolve('App\SampleClass'); // コンテナがクラスの依存を解決する
+    $sampleobject = resolve('App\SampleClass'); // クラスの依存を解決する
+    $sampleobject = app('App\SampleClass'); // インスタンス
+    $sampleobject = Illuminate\Foundation\Application::getInstance()->make('App\SampleClass'); // アプリ本体を取ってきてインスタンスを作る
+  ```
+  - 上記からわかるように、Laravel = サービスコンテナ
+</details>

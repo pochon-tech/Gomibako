@@ -350,4 +350,16 @@ class MyClass
       $productService->... // \App\Product のインスタンスが注入される
 ```
 
+**場合によって初期化する**
+- クラスのインスタンスは必ずnewから始まるわけではない。
+- 例えば、セッションやファイルにシリアライズされて保存されたインスタンスがある場合、それを使い、ない場合はnewといった感じ。
+```php:
+// AppServiceProvider.php
+// セッションに保存されていたシングルトンを復旧
+$this->app->singleton(\App\SessionStore::class, function ($app) {
+    // キーが存在していない場合に返すデフォルト値を第2引数に指定できる
+    $obj = session('_SESSION_STORE', null);
+    return $obj ?? new \App\SessionStore();
+});
+```
 </details>

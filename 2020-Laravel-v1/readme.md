@@ -363,3 +363,38 @@ $this->app->singleton(\App\SessionStore::class, function ($app) {
 });
 ```
 </details>
+
+<details><summary>シングルトンの誤解</summary>
+
+- 当然だが、下記のようなsessionのように画面を跨いで同じインスタンスを引き継ぐことはできない。
+```php:
+// AppServiceProvider.php
+public function register() {
+    $this->app->singleton(OrgService::class,OrgService::class);
+}
+// シングルトンなOrgServiceをOrgControllerで使用する。
+class OrgController extends Controller{
+    public function input(Request $request){
+        spl_object_hash(resolve(OrgService::class);　#・・・A
+        spl_object_hash(resolve(OrgService::class);　#・・・B ※Aと同じ識別子を確認
+    }
+
+    public function confirm(Request $request){
+        spl_object_hash(resolve(OrgService::class);　#・・・C ※A,Bと異なる識別子を確認
+    }
+}
+```
+- これはそもそもリクエストのタイミングでPHPプロセスが異なっている。
+```sh:
+(間違い)
+                                        OrgController@input
+    Request -> PHPプロセス-> Laravel ->                         -> singleton
+                                        OrgController@confirm
+(正解)
+Request -> PHPプロセス -> Laravel ->  OrgController@input -> singleton
+Request -> PHPプロセス -> Laravel ->  OrgController@confirm -> singleton
+```
+- シングルトンは1回のPHPセッションでしか共有されない。コントローラも同じ。シングルトンもコントローラもリクエスト毎に毎回作り直される。前のことは覚えていない。
+- ただし、シングルトンごとsessionデータに保存する方法を使えばSession経由になるので、維持させることは可能。
+
+</details>

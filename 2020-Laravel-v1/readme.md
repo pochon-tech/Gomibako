@@ -114,6 +114,11 @@ wget http://phpdoc.org/phpDocumentor.phar
 - 実装
   - `mkdir app/Services; touch app/Services/UserService.php`
 
+**リポジトリ**
+- ファクトリやモデルへのアクセスに利用し、各サービスからのモデルアクセス方法を統一
+- 実装
+  - `mkdir app/Repositories; touch app/Repositories/UserRepository.php`
+
 ### Tips
 
 <details><summary>サービスコンテナ復習</summary>

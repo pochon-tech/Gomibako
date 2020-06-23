@@ -2,8 +2,9 @@
 namespace App\Repositories;
 
 use App\Entities;
-use App\User;
-use Illuminate\Database\Eloquent\Collection;
+use App\Factories\UserFactory;
+use App\Models\User;
+use \Illuminate\Database\Eloquent\Collection;
 
 class UserRepository
 {

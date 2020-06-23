@@ -119,6 +119,13 @@ wget http://phpdoc.org/phpDocumentor.phar
 - 実装
   - `mkdir app/Repositories; touch app/Repositories/UserRepository.php`
 
+**ファクトリ**
+- エンティティや関連する値オブジェクト等の生成は全てファクトリ内で行う
+- エンティティを生成したくなったらこのファクトリを使うことでnewを集約
+- 生成方法に変更が発生した場合もこのクラスだけ修正するようにする。
+- 実装
+  - `mkdir app/Factories; touch app/Factories/UserFactory.php`
+
 ### Tips
 
 <details><summary>サービスコンテナ復習</summary>

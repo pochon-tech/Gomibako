@@ -41,3 +41,7 @@ var obj2ary = x => {
 console.log(sample)
 console.log(ary2obj(sample))
 console.log(obj2ary(ary2obj(sample)))
+
+// 特定のプロパティのものだけ抽出
+var hoge = {a:"test1", b:"test2", c:"test3", d:"test4", e:"test5"}
+console.log(Object.fromEntries(Object.entries(hoge).filter(([k, v]) => !! ['a', 'b', 'c'].includes(k))))

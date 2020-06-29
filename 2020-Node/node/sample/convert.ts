@@ -1,5 +1,4 @@
 import * as fs from 'fs'
-import * as path from 'path'
 import glob from 'glob' // yarn add glob @types/glob
 
 const exportCSV = (arr: string[]) => {
@@ -13,8 +12,8 @@ const exportCSV = (arr: string[]) => {
 const readFile = (filePath: string): string[] => {
     try {
         const data = fs.readFileSync(filePath, 'utf-8')
-        const list: string[]| null = data.match(/(({{)(\s*\$t\()(.*)(\)\s*}}))/g)
-        return list ? list.map(item => { return item.replace(/^{{\s*/, '').replace(/\$t\(("|')/, '').replace(/("|')\)\s*}}$/, '') }) : []
+        const list: string[]| null = data.match(/((\$t\()(.*)(\)))/g)
+        return list ? list.map(item => { return item.replace(/^\s*/, '').replace(/\$t\(("|')/, '').replace(/("|')\)\s*$/, '') }) : []
     }catch (e) {
         console.log(e)
         return []
@@ -38,11 +37,12 @@ const searchFiles = (dirPath: string, extPattern: string) => {
 }
 
 const main = (): void => {
-    const fileList: string[] = searchFiles(__dirname + "/html", "**/*.html")
+    // 対象文字抜き出し
+    const fileList: string[] = searchFiles(__dirname + "/pages", "**/*.vue").concat(searchFiles(__dirname + "/components", "**/*.vue"))
     let exportList: string[] = []
     for (let file of fileList) {
         exportList = exportList.concat(readFile(file))
     }
-    exportCSV(exportList)
+    exportCSV(exportList.filter((x, i, self) => self.indexOf(x) == i))
 }
 main()

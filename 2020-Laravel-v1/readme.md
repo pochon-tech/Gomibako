@@ -136,6 +136,9 @@ wget http://phpdoc.org/phpDocumentor.phar
 - Routingの調整を行う
   - `vi routes/web.php`
 
+**Models**
+- Eloqunt Modelを移動させる
+
 ### Tips
 
 <details><summary>サービスコンテナ復習</summary>

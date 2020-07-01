@@ -17,10 +17,10 @@ class UserService
     
     public function list(): Collection
     {
-        $this->user_repos->list();
+        return $this->user_repos->list();
     }
 
-    public function store(array $request_params): void
+    public function store(array $request_params): bool
     {
         try {
             $user = $this->user_repos->new($request_params);

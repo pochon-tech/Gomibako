@@ -6,7 +6,7 @@ use App\ValueObjects\User\Name;
 use App\ValueObjects\User\Email;
 use App\ValueObjects\User\Password;
 
-class UserFactories
+class UserFactory
 {
     public function make(string $name, string $email, string $password): User
     {

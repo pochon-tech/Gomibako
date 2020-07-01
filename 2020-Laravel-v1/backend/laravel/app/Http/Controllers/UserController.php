@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StoreUserPost;
+use App\Services\UserService;
 
 class UserController extends Controller
 {

@@ -132,6 +132,9 @@ wget http://phpdoc.org/phpDocumentor.phar
 - 実装
   - `mkdir app/Entities; touch app/Entities/User.php`
 
+**Routing周り調整**
+- Routingの調整を行う
+  - `vi routes/web.php`
 
 ### Tips
 

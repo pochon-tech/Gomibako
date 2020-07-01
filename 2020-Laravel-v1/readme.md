@@ -126,6 +126,13 @@ wget http://phpdoc.org/phpDocumentor.phar
 - 実装
   - `mkdir app/Factories; touch app/Factories/UserFactory.php`
 
+**エンティティ**
+- 同一性を識別するモデル
+- 登録や更新をする場合は、ここで生成されたエンティティを使用することで、不正なデータ登録を防ぐ
+- 実装
+  - `mkdir app/Entities; touch app/Entities/User.php`
+
+
 ### Tips
 
 <details><summary>サービスコンテナ復習</summary>

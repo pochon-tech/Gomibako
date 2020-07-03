@@ -423,3 +423,24 @@ Request -> PHPプロセス -> Laravel ->  OrgController@confirm -> singleton
 - ただし、シングルトンごとsessionデータに保存する方法を使えばSession経由になるので、維持させることは可能。
 
 </details>
+
+
+<details><summary>php artisan make:auth</summary>
+
+- 認証機能付きユーザ機能を自動生成してくれる。
+- `laravel\framework\src\Illuminate\Routing\Router.php`の`auth()`メソッドでRoutingの登録を行っている。
+- `php artisan make:auth`で実行。
+- `routes\web.php`に、`Auth::routes();`という記述が追加される。
+- `Auth::routes`には引数を与えることができる
+```php:
+Auth::routes([
+    'verify'   => true, // メール確認機能（※5.7系以上のみ）
+    'register' => false, // デフォルトの登録機能OFF
+    'reset'    => true,  // メールリマインダー機能ON
+]);
+```
+
+</details>
+
+<details><summary>Facade</summary>
+</details>

@@ -62,6 +62,11 @@
   - 上記のように $data をそのまま返却すると、JSONエンコード整形された形で返却するようだ。エスケープを回避して画面で一度確認したいのであれば、2 のやり方を行えば良い
   - [PHPにおけるJSONエンコード整形](https://qiita.com/kiyc/items/afb51bce546af3e18594)
 
+### ビューを作成してみる
+- `resources/views/contacts/layout.blade.php` として基本的なレイアウトファイルを作成する
+- `resources/views/contacts/index.blade.php` として一覧表示画面を作成する
+- ContactController::index() の返却値を`return view('contacts.index', ['contacts' => $data]);` としてテンプレートを指すようにする
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
@@ -72,4 +77,4 @@
 # VSCODE拡張
 - PHP Intelephense: PHPのコード補完、参照の検索や定義への移動などなど
 - Dot ENV: .envファイルの色分けしてくれる
-
+- [Laravel関係の拡張リスト](https://qiita.com/hitotch/items/9b5c8e28f50e0e3f7806)

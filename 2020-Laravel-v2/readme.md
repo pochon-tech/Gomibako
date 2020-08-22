@@ -48,6 +48,20 @@
 - `database/seeds/DatabaseSeeder.php`の編集して、`php artisan db:seed` を実行してテストデータ投入
 - `php artisan tinker; $data = App\Contact::all(); exit;` でテストデータを確認
 
+### 一覧表示の実装をしてみる
+```php:
+    public function index()
+    {
+        $data = Contact::all();
+        return $data; // ... 1
+        // return json_encode($data, JSON_UNESCAPED_UNICODE); // ... 2 エスケープ回避
+    }
+```
+- `http://localhost/contacts` にアクセスすると、まだビューを用意していないため、JSONデータが返ってくることがわかる
+  - `[{"id":1,"name":"\u7530\u4e2d\u592a\u90ce","tel":"01100001111","mail":"test@exammple.com","contents":"\u304a\u554f\u3044\u5408\u308f\u305b\u3092\u3057\u307e\u3059","file_path":"","created_at":null,"updated_at":null}]`
+  - 上記のように $data をそのまま返却すると、JSONエンコード整形された形で返却するようだ。エスケープを回避して画面で一度確認したいのであれば、2 のやり方を行えば良い
+  - [PHPにおけるJSONエンコード整形](https://qiita.com/kiyc/items/afb51bce546af3e18594)
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

@@ -76,14 +76,23 @@
   return view('contacts.index', ['contacts' => $data])
       ->with('i', (request()->input('page', 1) - 1) * 3);
 ```
-  - Laravelでは、Controller側で、クエリビルダの`paginate()`を実行して、Blade側で `{{$datas->links()}}` を指定するだけでページングは実装できてしまう。
+- Laravelでは、Controller側で、クエリビルダの`paginate()`を実行して、Blade側で `{{$datas->links()}}` を指定するだけでページングは実装できてしまう。
   - [Laravelでのページング処理](https://www.ravness.com/2018/09/laravelpagination/)
   - [クエリビルダ](https://readouble.com/laravel/7.x/ja/queries.html)のlatest()とpaginate()を使用して、DBからのデータを取得
   - latest() メソッドにより、降順にソートされたデータが取得される (引数を指定することでソートしたいカラムを指定できる、指定しない場合は`created_at`)
   - `{{$datas->links()}}`は、 ページ番号ボタンの実装であり、ページ番号押下時に Getパラメーターに`page=x`を付与させる
     - なお、通常、blade内の `{{ }}文` の記述は、 XSS攻撃を防ぐために、自動的にPHPのhtmlspecialchars関数を通している
     - エスケープをしたくない場合は、`{!! !!}文` に置き換えることで、エスケープ回避できる
-  - `->with('i', (request()->input('page', 1) - 1) * 3);` は何をしているかというと、一覧表示画面での「No」の変数を現在のページ数によって初期値を変えている実装である
+- `->with('i', (request()->input('page', 1) - 1) * 3);` は何をしているかというと、一覧表示画面での「No」の変数を現在のページ数によって初期値を変えている実装である
+```php:
+
+  $contacts = Contact::latest('id')->paginate(3);
+  return view('contacts.index', compact('contacts'))
+      ->with('i', (request()->input('page', 1) - 1) * 3);
+```
+- [ControllerからViewへの変数の受け渡し](https://qiita.com/ryo2132/items/63ced19601b3fa30e6de)を少し変えてみた
+- ControllerからViewへ変数を渡す場合は、compact関数を使用するか、withメソッドを使用するかのどちらか
+- compact関数のほうが可読性は高い
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

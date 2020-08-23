@@ -14,8 +14,9 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $data = Contact::all();
-        return view('contacts.index', ['contacts' => $data]);
+        $data = Contact::latest('id')->paginate(3);
+        return view('contacts.index', ['contacts' => $data])
+            ->with('i', (request()->input('page', 1) - 1) * 3);
     }
 
     /**

@@ -67,6 +67,32 @@
 - `resources/views/contacts/index.blade.php` として一覧表示画面を作成する
 - ContactController::index() の返却値を`return view('contacts.index', ['contacts' => $data]);` としてテンプレートを指すようにする
 
+### 詳細表示の実装をしてみる
+```html:
+  <form action="{{ route('contacts.destroy',$contact->id) }}" method="POST">
+      <a class="btn btn-info" href="{{ route('contacts.show',$contact->id) }}">Show</a>
+      <a class="btn btn-primary" href="{{ route('contacts.edit',$contact->id) }}">Edit</a>
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn btn-danger" onclick="return window.confirm('Delete ??');">
+          <span>Delete</span>
+      </button>
+  </form>
+```
+- 上記のように、一覧画面内に詳細画面へ遷移する導線を用意した
+- blade内で、`{{ route('route-name', params) }}`とすることで、route名にしたがってURLを構築してくれる (`php artisan route:list` でroute名は確認できる)
+```php:
+    public function show(Contact $contact)
+    {
+        dump($contact->name); // 田中四郎
+        return view('contacts.show',compact('contact'));
+    }
+```
+- 上記はControllerの詳細表示の実装である
+- [モデル結合ルート](https://readouble.com/laravel/7.x/ja/routing.html#route-model-binding)を使用した実装方法であり、リクエストされたURIの対応する値に一致するIDを持つ、モデルインスタンスを自動的に注入している
+- つまり、`http://localhost/contacts/4` のようなURIがリクエストされた場合、contactsテーブルからIDが4のデータを取得するクエリが自動的に実行されて、showメソッドの引数に受け渡されているということになる
+
+
 ### ページング処理を実装してみる
 - テストデータを数件、シーダーから登録してみる
 - ContactTableSeederにデータを追加して、`php artisan migrate:refresh --seed` を実行してデータベースを再構築する
@@ -85,7 +111,6 @@
     - エスケープをしたくない場合は、`{!! !!}文` に置き換えることで、エスケープ回避できる
 - `->with('i', (request()->input('page', 1) - 1) * 3);` は何をしているかというと、一覧表示画面での「No」の変数を現在のページ数によって初期値を変えている実装である
 ```php:
-
   $contacts = Contact::latest('id')->paginate(3);
   return view('contacts.index', compact('contacts'))
       ->with('i', (request()->input('page', 1) - 1) * 3);

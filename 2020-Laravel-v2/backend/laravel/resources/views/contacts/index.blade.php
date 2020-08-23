@@ -46,7 +46,9 @@
                     @csrf
                     @method('DELETE')
       
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger" onclick="return window.confirm('Delete ??');">
+                        <span>Delete</span>
+                    </button>
                 </form>
             </td>
         </tr>

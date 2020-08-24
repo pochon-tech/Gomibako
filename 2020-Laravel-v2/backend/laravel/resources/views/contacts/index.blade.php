@@ -9,7 +9,7 @@
                 <h2>お問い合わせ一覧</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-success" href="{{ route('contacts.create') }}"> Create New Product</a>
+                <a class="btn btn-success" href="{{ route('contacts.create') }}"> 新規作成</a>
             </div>
         </div>
     </div>

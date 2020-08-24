@@ -80,6 +80,7 @@
   </form>
 ```
 - 上記のように、一覧画面内に詳細画面へ遷移する導線を用意した
+- `resources/views/contacts/show.blade.php` として詳細表示画面を作成する
 - blade内で、`{{ route('route-name', params) }}`とすることで、route名にしたがってURLを構築してくれる (`php artisan route:list` でroute名は確認できる)
 ```php:
     public function show(Contact $contact)
@@ -118,6 +119,71 @@
 - [ControllerからViewへの変数の受け渡し](https://qiita.com/ryo2132/items/63ced19601b3fa30e6de)を少し変えてみた
 - ControllerからViewへ変数を渡す場合は、compact関数を使用するか、withメソッドを使用するかのどちらか
 - compact関数のほうが可読性は高い
+
+### マイグレーションファイルでカラムを更新してみる
+- 続いて、登録処理を行いたいが、その前に、登録処理をテストするにあたり、添付ファイルはひとまずNULLで登録できるようにしておきたい
+- しかし、最初にマイグレーションファイルを作成したときに、NULLを許可しないような定義にしてしまった
+- [マイグレーションファイル内でカラムの変更](https://laravel.com/docs/7.x/migrations#modifying-columns)
+- マイグレーションファイルで管理するために下記のような手順でカラムの更新を行っていく
+  - `php artisan make:migration update_contacts_table --table=contacts`で新しくファイルを作成する
+  - 今回は、file_pathのカラム属性をnull許可にしたい
+  - ```php:
+          public function up()
+          {
+              Schema::table('contacts', function (Blueprint $table) {
+                  $table->text('file_path')->nullable()->change();
+              });
+              
+          }
+          public function down()
+          {
+            Schema::table('contacts', function (Blueprint $table) {
+                $table->text('file_path')->nullable(false)->change();
+            });
+          } 
+      ```
+  - 定義できたら`php artisan migrate`を実行して更新するが、、、おそらく下記のようなエラーが発生するはず
+  - `Changing columns for table "contacts" requires Doctrine DBAL. Please install the doctrine/dbal package.`
+  - [カラムの属性を変更する](https://readouble.com/laravel/7.x/ja/migrations.html#modifying-columns)
+  - `cd laravel; composer require doctrine/dbal` で該当パッケージをインストールしておく
+  - インストールできたら、再び`php artisan migrate`を実行して更新してみる
+
+### 登録処理を実装してみる
+- `resources/views/contacts/create.blade.php` : 登録画面
+- [LaravelのORMで登録するときのやり方](https://qiita.com/henriquebremenkanp/items/cd13944b0281297217a9#%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E3%81%A8%E3%81%8D)を参考に実装してみる
+```php:
+    public function create()
+    {
+        return view('contacts.create');
+    }
+    public function store(Request $request)
+    {
+        $request->validate(
+            [
+                'name' => 'required',
+                'mail' => 'required',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+            ],
+            [
+                'name.required' => '名前は必須です',
+                'mail.required' => 'メールは必須です',
+                'tel.required' => '電話番号は必須です',
+                'tel.max' => '電話番号は最大15文字までです',
+                'tel.not_regex' => '電話番号は半角数字で入力してください',
+            ]
+        );
+  
+        Contact::create($request->all());
+        return redirect()->route('contacts.index')->with('success','登録完了');
+    }
+```
+- createメソッドでは、登録フォーム画面を返してあげる
+- storeメソッドでは、実際の登録処理とバリデーション処理を実装している
+- `$request->validate`の第二引数にカスタムメッセージを指定できる
+- これだけでは、まだ登録できないので、Contactモデルに`fillable`を指定して、データベースに保存するカラムを決める
+  - `protected $fillable = ['name', 'mail', 'tel', 'contents', 'file_path'];`
+  - [fillable使い所](https://qiita.com/mmmmmmanta/items/74b6891493f587cc6599#%E3%81%A9%E3%81%A1%E3%82%89%E3%81%8C%E3%81%8A%E3%81%99%E3%81%99%E3%82%81%E3%81%8B)
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

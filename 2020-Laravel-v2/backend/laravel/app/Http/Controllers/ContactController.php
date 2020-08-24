@@ -15,8 +15,7 @@ class ContactController extends Controller
     public function index()
     {
         $contacts = Contact::latest('id')->paginate(3);
-        return view('contacts.index', compact('contacts'))
-            ->with('i', (request()->input('page', 1) - 1) * 3);
+        return view('contacts.index', compact('contacts'))->with('i', (request()->input('page', 1) - 1) * 3);
     }
 
     /**
@@ -26,7 +25,7 @@ class ContactController extends Controller
      */
     public function create()
     {
-        //
+        return view('contacts.create');
     }
 
     /**
@@ -37,7 +36,24 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            [
+                'name' => 'required',
+                'mail' => 'required',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+            ],
+            [
+                'name.required' => '名前は必須です',
+                'mail.required' => 'メールは必須です',
+                'tel.required' => '電話番号は必須です',
+                'tel.max' => '電話番号は最大15文字までです',
+                'tel.not_regex' => '電話番号は半角数字で入力してください',
+            ]
+        );
+  
+        Contact::create($request->all());
+   
+        return redirect()->route('contacts.index')->with('success','登録完了');
     }
 
     /**

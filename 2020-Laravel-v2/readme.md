@@ -199,13 +199,25 @@
 - ただし、例えば自分自身の更新でメール以外の変更はあれど、メールの変更がない場合の除外をしたい場合、Ruleクラスを使うと楽に実装できるようなので、Validationの部分の実装はまだ変更の余地がある
 - [ユニークなValidation](https://readouble.com/laravel/7.x/ja/validation.html#rule-unique)
 
-
 ### 編集処理を実装してみる
 - `resources/views/contacts/edit.blade.php` : 編集画面
 - 詳細表示処理と同じように、モデル結合ルートを使用して、URLのIDに対応したContact情報を編集画面は渡してあげる
 - `edit.blade.php` のformタグ内では忘れずに`@method="PUT"`を定義しておく
   - HTMLフォームでは、PUT、PATCH、DELETEリクエストを作成できないため、見かけ上のHTTP動詞を指定するための_methodフィールドを追加する必要がある
   - bladeでは、@methodを使用することで、実現できる
+- Controllerのupdate()メソッドでも、モデル結合ルートを使用して記述量を減らした
+
+### 削除処理
+- 特にテンプレートは用意せずに、一覧画面で削除ボタンを押下したら削除されるように実装する
+- Controllerのdestroyメソッドもモデル結合ルートを使用して、記述量を減らす
+```php:
+    public function destroy(Contact $contact)
+    {
+        $contact->delete();
+        return redirect()->route('contacts.index')->with('success','削除完了しました');
+    }
+```
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

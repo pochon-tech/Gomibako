@@ -39,15 +39,15 @@
             <td>
                 <form action="{{ route('contacts.destroy',$contact->id) }}" method="POST">
    
-                    <a class="btn btn-info" href="{{ route('contacts.show',$contact->id) }}">Show</a>
+                    <a class="btn btn-info" href="{{ route('contacts.show',$contact->id) }}">詳細</a>
     
-                    <a class="btn btn-primary" href="{{ route('contacts.edit',$contact->id) }}">Edit</a>
+                    <a class="btn btn-primary" href="{{ route('contacts.edit',$contact->id) }}">編集</a>
    
                     @csrf
                     @method('DELETE')
       
-                    <button type="submit" class="btn btn-danger" onclick="return window.confirm('Delete ??');">
-                        <span>Delete</span>
+                    <button type="submit" class="btn btn-danger" onclick="return window.confirm('削除してもよいですか？');">
+                        <span>削除</span>
                     </button>
                 </form>
             </td>

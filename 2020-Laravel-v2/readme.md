@@ -200,6 +200,13 @@
 - [ユニークなValidation](https://readouble.com/laravel/7.x/ja/validation.html#rule-unique)
 
 
+### 編集処理を実装してみる
+- `resources/views/contacts/edit.blade.php` : 編集画面
+- 詳細表示処理と同じように、モデル結合ルートを使用して、URLのIDに対応したContact情報を編集画面は渡してあげる
+- `edit.blade.php` のformタグ内では忘れずに`@method="PUT"`を定義しておく
+  - HTMLフォームでは、PUT、PATCH、DELETEリクエストを作成できないため、見かけ上のHTTP動詞を指定するための_methodフィールドを追加する必要がある
+  - bladeでは、@methodを使用することで、実現できる
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)

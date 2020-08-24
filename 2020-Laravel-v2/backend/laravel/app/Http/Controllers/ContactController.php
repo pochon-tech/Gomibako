@@ -73,9 +73,9 @@ class ContactController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Contact $contact)
     {
-        //
+        return view('contacts.edit',compact('contact'));
     }
 
     /**
@@ -85,9 +85,27 @@ class ContactController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Contact $contact)
     {
-        //
+        
+        $request->validate(
+            [
+                'name' => 'required',
+                'mail' => 'required|unique:contacts,mail',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+            ],
+            [
+                'name.required' => '名前は必須です',
+                'mail.required' => 'メールは必須です',
+                'tel.required' => '電話番号は必須です',
+                'tel.max' => '電話番号は最大15文字までです',
+                'tel.not_regex' => '電話番号は半角数字で入力してください',
+            ]
+        );
+  
+        $contact->update($request->all());
+   
+        return redirect()->route('contacts.index')->with('success','編集完了');
     }
 
     /**

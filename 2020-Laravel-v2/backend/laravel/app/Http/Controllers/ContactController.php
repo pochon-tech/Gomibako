@@ -39,7 +39,7 @@ class ContactController extends Controller
         $request->validate(
             [
                 'name' => 'required',
-                'mail' => 'required',
+                'mail' => 'required|unique:contacts,mail',
                 'tel' => 'required|max:15|not_regex:/[^0-9]/',
             ],
             [

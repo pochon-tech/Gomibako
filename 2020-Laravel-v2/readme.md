@@ -184,6 +184,21 @@
   - `protected $fillable = ['name', 'mail', 'tel', 'contents', 'file_path'];`
   - [fillable使い所](https://qiita.com/mmmmmmanta/items/74b6891493f587cc6599#%E3%81%A9%E3%81%A1%E3%82%89%E3%81%8C%E3%81%8A%E3%81%99%E3%81%99%E3%82%81%E3%81%8B)
 
+### 重複チェックをしてみた
+```php:
+    public function store(Request $request)
+    {
+        $request->validate(
+            [
+                'name' => 'required',
+                'mail' => 'required|unique:contacts,mail',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+            ],
+```
+- `unique:[table-name],[colmun-name]`でユニーク制約のかかったカラムの重複チェックを行うことができる
+- ただし、例えば自分自身の更新でメール以外の変更はあれど、メールの変更がない場合の除外をしたい場合、Ruleクラスを使うと楽に実装できるようなので、Validationの部分の実装はまだ変更の余地がある
+- [ユニークなValidation](https://readouble.com/laravel/7.x/ja/validation.html#rule-unique)
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

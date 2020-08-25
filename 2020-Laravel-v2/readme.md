@@ -229,6 +229,82 @@
 - [oldメソッドの第二引数にdefault値を代入](https://tacosvilledge.hatenablog.com/entry/2018/05/14/195402)することで解決することができる
 - edit.blade.phpのInput要素に`value="{{ old('name', $contact->name) }}"`といった具合で実現可能
 
+### FormRequestを使用する
+- ValidationをControllerから切り離して、Validation専用のファイルを作り処理させてしまおう
+- FormRequestで別ファイル化する前に、少しValidation周りで整理する
+- 本来、Validationの処理は以下のような記述をControllerに記述する
+```php:
+    public function store( Request $request ){
+
+        // バリデーションルールを設定
+        $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'mail' => 'required|unique:contacts,mail',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+                'contents' => 'required',
+        ]);
+        // バリデーションルールにでエラーの場合 
+        if ($validator->fails()) return redirect('/')->withInput()->withErrors($validator);
+    }
+```
+- FormRequestを使用すると`if ($validator->fails())`文のエラーがある場合の記述が必要なくなるようだ
+  - redirect先はフォーム送信元に自動で戻る
+  - withErrors()は自動で行われ、$errors変数が作成される
+  - withInput()は自動で行われる
+- ちなみに、現在のValidation実装は以下
+```php:
+    public function store(Request $request)
+    {
+        $request->validate(
+            [
+                'name' => 'required',
+                'mail' => 'required|unique:contacts,mail',
+                'tel' => 'required|max:15|not_regex:/[^0-9]/',
+                'contents' => 'required',
+            ]
+        );
+        Contact::create($request->all());
+        return redirect()->route('contacts.index')->with('success','登録完了');
+    }
+```
+- すでに、`if ($validator->fails())`文周りは省略されてはいるのだが、Controllerのメソッド毎に記述するのはよろしくない
+- ここからが本題だが、`php artisan make:request ContactInputPost` を実行して、FormRequestを継承したClassを作成し、以下のようにルールとカスタムメッセージを実装する
+```php:
+    public function authorize()
+    {
+        return true; // 使用する場合は、falseからtrueに変更（デフォルトはfalse)
+    }
+    // Validationルール
+    public function rules()
+    {
+        return [
+            'name' => 'required',
+            'mail' => 'required|unique:contacts,mail',
+            'tel' => 'required|max:15|not_regex:/[^0-9]/',
+            'contents' => 'required',
+        ];
+    }
+    // カスタムメッセージ省略可能 function名は必ず「messages」
+    public function messages(){
+        return [
+            'name.required' => '名前は必須です',
+            'mail.required' => 'メールは必須です',
+            'tel.required' => '電話番号は必須です',
+            'tel.max' => '電話番号は最大15文字までです',
+            'tel.not_regex' => '電話番号は半角数字で入力してください',
+        ];
+    }
+```
+- 上記のファイルを用意できたら、Controllerに記述していたValidation処理を削除する
+- また、メソッドの引数を下記のように変更して、作成したFormRequestを引数に渡してあげる
+```php:
+    public function store(ContactInputPost $request)
+    {
+        Contact::create($request->all());
+        return redirect()->route('contacts.index')->with('success','登録完了');
+    }
+```
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)

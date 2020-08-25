@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contact;
 use Illuminate\Http\Request;
+use App\Http\Requests\ContactInputPost; 
 
 class ContactController extends Controller
 {
@@ -31,29 +32,12 @@ class ContactController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\ContactInputPost  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ContactInputPost $request)
     {
-        $request->validate(
-            [
-                'name' => 'required',
-                'mail' => 'required|unique:contacts,mail',
-                'tel' => 'required|max:15|not_regex:/[^0-9]/',
-                'contents' => 'required',
-            ],
-            [
-                'name.required' => '名前は必須です',
-                'mail.required' => 'メールは必須です',
-                'tel.required' => '電話番号は必須です',
-                'tel.max' => '電話番号は最大15文字までです',
-                'tel.not_regex' => '電話番号は半角数字で入力してください',
-            ]
-        );
-  
         Contact::create($request->all());
-   
         return redirect()->route('contacts.index')->with('success','登録完了');
     }
 
@@ -82,31 +66,13 @@ class ContactController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\ContactInputPost  $request
      * @param  \App\Contact  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Contact $contact)
+    public function update(ContactInputPost $request, Contact $contact)
     {
-        
-        $request->validate(
-            [
-                'name' => 'required',
-                'mail' => 'required|unique:contacts,mail',
-                'tel' => 'required|max:15|not_regex:/[^0-9]/',
-                'contents' => 'required',
-            ],
-            [
-                'name.required' => '名前は必須です',
-                'mail.required' => 'メールは必須です',
-                'tel.required' => '電話番号は必須です',
-                'tel.max' => '電話番号は最大15文字までです',
-                'tel.not_regex' => '電話番号は半角数字で入力してください',
-            ]
-        );
-  
         $contact->update($request->all());
-   
         return redirect()->route('contacts.index')->with('success','編集完了');
     }
 

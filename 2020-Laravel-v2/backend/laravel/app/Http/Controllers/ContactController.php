@@ -41,6 +41,7 @@ class ContactController extends Controller
                 'name' => 'required',
                 'mail' => 'required|unique:contacts,mail',
                 'tel' => 'required|max:15|not_regex:/[^0-9]/',
+                'contents' => 'required',
             ],
             [
                 'name.required' => '名前は必須です',
@@ -93,6 +94,7 @@ class ContactController extends Controller
                 'name' => 'required',
                 'mail' => 'required|unique:contacts,mail',
                 'tel' => 'required|max:15|not_regex:/[^0-9]/',
+                'contents' => 'required',
             ],
             [
                 'name.required' => '名前は必須です',

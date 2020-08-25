@@ -30,31 +30,31 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Name:</strong>
-                <input type="text" name="name" class="form-control" placeholder="Name">
+                <input type="text" name="name" class="form-control" placeholder="Name" value="{{ old('name') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Mail:</strong>
-                <input type="text" name="mail" class="form-control" placeholder="Mail">
+                <input type="text" name="mail" class="form-control" placeholder="Mail" value="{{ old('mail') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Tel:</strong>
-                <input type="text" name="tel" class="form-control" placeholder="Tel">
+                <input type="text" name="tel" class="form-control" placeholder="Tel" value="{{ old('tel') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Contents:</strong>
-                <input type="text" name="contents" class="form-control" placeholder="Contents">
+                <input type="text" name="contents" class="form-control" placeholder="Contents" value="{{ old('contents') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>file_path:</strong>
-                <input type="text" name="file_path" class="form-control" placeholder="file_path">
+                <input type="text" name="file_path" class="form-control" placeholder="file_path" value="{{ old('file_path') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

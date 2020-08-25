@@ -207,7 +207,7 @@
   - bladeでは、@methodを使用することで、実現できる
 - Controllerのupdate()メソッドでも、モデル結合ルートを使用して記述量を減らした
 
-### 削除処理
+### 削除処理を実装してみる
 - 特にテンプレートは用意せずに、一覧画面で削除ボタンを押下したら削除されるように実装する
 - Controllerのdestroyメソッドもモデル結合ルートを使用して、記述量を減らす
 ```php:
@@ -217,6 +217,11 @@
         return redirect()->route('contacts.index')->with('success','削除完了しました');
     }
 ```
+
+### 直前のデータを取得する
+- 登録画面で入力エラーでフォームに戻ったときに入力していた値を表示させておきたい
+- [直前のデータを取得](https://readouble.com/laravel/7.x/ja/requests.html#old-input)を参考にすると良い
+- create.blade.phpのInput要素に`value="{{ old('input-name') }}"` を追加してあげるだけで実現可能
 
 
 # 参考サイト

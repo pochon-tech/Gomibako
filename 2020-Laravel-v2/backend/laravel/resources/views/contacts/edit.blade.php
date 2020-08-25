@@ -26,7 +26,7 @@
 <form action="{{ route('contacts.update',$contact->id) }}" method="POST">
     @csrf
     @method('PUT')
-
+    <input type="hidden" name="id" value="{{ $contact->id }}">
      <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">

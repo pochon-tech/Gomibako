@@ -305,6 +305,14 @@
     }
 ```
 
+### 重複チェックをしてみた Ver 2
+- 前回も重複チェックは行ったが、編集のときに自身の重複チェックが不自然になっていた
+- [laravel属性の一意の検証ルールでモデルを更新](https://www.it-swarm.dev/ja/php/laravel%E5%B1%9E%E6%80%A7%E3%81%AE%E4%B8%80%E6%84%8F%E3%81%AE%E6%A4%9C%E8%A8%BC%E3%83%AB%E3%83%BC%E3%83%AB%E3%81%A7%E3%83%A2%E3%83%87%E3%83%AB%E3%82%92%E6%9B%B4%E6%96%B0/1045012394/)を参考に下記の手順で実装してみた
+  - `edit.blade.php`のformタグ内に`<input type="hidden" name="id" value="{{ $contact->id }}">`を追記
+  - FormRequestクラス (`ContactInputPost`) にRuleクラス (`use Illuminate\Validation\Rule;`) を追記
+  - 現在のIDを無視する一意のルールを追加 `'mail' => ['required', Rule::unique('contacts')->ignore($this->id)],`
+  - storeメソッドと同じようにupdateメソッドでフォームリクエストを引数に渡す
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)
@@ -315,3 +323,11 @@
 - PHP Intelephense: PHPのコード補完、参照の検索や定義への移動などなど
 - Dot ENV: .envファイルの色分けしてくれる
 - [Laravel関係の拡張リスト](https://qiita.com/hitotch/items/9b5c8e28f50e0e3f7806)
+
+# 便利
+- blade上でデバッグ作業
+```blade.php:
+@php
+    dd();
+@endphp
+```

@@ -223,6 +223,11 @@
 - [直前のデータを取得](https://readouble.com/laravel/7.x/ja/requests.html#old-input)を参考にすると良い
 - create.blade.phpのInput要素に`value="{{ old('input-name') }}"` を追加してあげるだけで実現可能
 
+### 直前のデータを取得する （ デフォルトあり )
+- 編集画面では、一度登録した内容を取得してViewに返してで表示し、それが変更されたらDBを更新するという流れである
+- では、取得した内容をInput要素に入れこみつつ、Validationでフォームに戻ったらold()の内容を再表示する場合はどうすればよいか
+- [oldメソッドの第二引数にdefault値を代入](https://tacosvilledge.hatenablog.com/entry/2018/05/14/195402)することで解決することができる
+- edit.blade.phpのInput要素に`value="{{ old('name', $contact->name) }}"`といった具合で実現可能
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

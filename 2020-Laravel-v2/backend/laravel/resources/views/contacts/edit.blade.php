@@ -31,31 +31,31 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Name:</strong>
-                <input type="text" name="name" value="{{ $contact->name }}" class="form-control" placeholder="Name">
+                <input type="text" name="name" value="{{ old('name', $contact->name) }}" class="form-control" placeholder="Name">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Mail:</strong>
-                <input type="text" name="mail" value="{{ $contact->mail }}" class="form-control" placeholder="Mail">
+                <input type="text" name="mail" value="{{ old('mail', $contact->mail) }}" class="form-control" placeholder="Mail">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Tel:</strong>
-                <input type="text" name="tel" value="{{ $contact->tel }}" class="form-control" placeholder="Tel">
+                <input type="text" name="tel" value="{{ old('tel', $contact->tel) }}" class="form-control" placeholder="Tel">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Contents:</strong>
-                <input type="text" name="contents" value="{{ $contact->contents }}" class="form-control" placeholder="Contents">
+                <input type="text" name="contents" value="{{ old('contents', $contact->contents) }}" class="form-control" placeholder="Contents">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>file_path:</strong>
-                <input type="text" name="file_path" value="{{ $contact->file_path }}" class="form-control" placeholder="file_path">
+                <input type="text" name="file_path" value="{{ old('contents', $contact->file_path) }}" class="form-control" placeholder="file_path">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

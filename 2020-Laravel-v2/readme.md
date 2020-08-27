@@ -334,7 +334,33 @@ public function rules()
         ],
 ```
 - Ruleオブジェクトを使用するパターンでも試してみる
-
+- `php artisan make:rule kana` で独自のルールオブジェクトを作成する
+```php:
+    // app/Rules/Kana.php
+    // 検証ルール（マッチすればTrueを返す）
+    public function passes($attribute, $value)
+    {
+        return preg_match('/[^ぁ-んー]/u', $value) === 0;
+    }
+    // エラーメッセージの実装
+    public function message()
+    {
+        return 'ひらがなで入力してください';
+    }
+    
+    // app/Http/Requests/ContactInputPost.php
+    // 使用する場合はNewする
+    public function rules()
+    {
+        return [
+            'name' => [
+                'required',
+                new Kana()
+            ],
+```
+- ここまでで紹介したやり方は`|`記法が使えない
+  - `'tel' => 'required|max:15|not_regex:/[^0-9]/',` ←のようなことができない
+  - `'name' => 'required|new Kana()` みたいなことはできない 
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

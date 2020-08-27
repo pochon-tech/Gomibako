@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Rules\Kana; 
 
 class ContactInputPost extends FormRequest
 {
@@ -27,13 +28,7 @@ class ContactInputPost extends FormRequest
         return [
             'name' => [
                 'required',
-                function ($attr, $value, $fail) {
-                    // dump($attr, $value, $fail); // name, 値, Closure($message)
-                    if (preg_match('/[^ぁ-んー]/u', $value) !== 0)
-                    {
-                        return $fail('ひらがなで入力してください');
-                    }
-                }
+                new Kana()
             ],
             'mail' => [
                 'required',

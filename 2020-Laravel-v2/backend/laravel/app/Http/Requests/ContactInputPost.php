@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Rules\Kana; 
 
 class ContactInputPost extends FormRequest
 {
@@ -26,10 +25,10 @@ class ContactInputPost extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'required',
-                new Kana()
-            ],
+            // 'name' => [
+            //     'required','kana'
+            // ],
+            'name' => 'required|kana',
             'mail' => [
                 'required',
                 Rule::unique('contacts')->ignore($this->id)
@@ -42,6 +41,7 @@ class ContactInputPost extends FormRequest
     // 省略可能
     public function messages(){
         return [
+            'kana' => 'かなはひらがなで入力してください',
             'name.required' => '名前は必須です',
             'mail.required' => 'メールは必須です',
             'mail.unique' => 'メールが重複しています',

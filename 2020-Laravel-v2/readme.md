@@ -314,7 +314,7 @@
   - storeメソッドと同じようにupdateメソッドでフォームリクエストを引数に渡す
 
 ### 独自のバリデーションを追加してみた
-- 試しに名前は「ひらがな」のみしか許可しないようなバリデーションを追加してみた。
+- [独自のバリデーションルールの作成方法](https://tac-blog.tech/index.php/2018/09/08/add-validation-rule/)を参考に、「ひらがな」のみしか許可しないようなバリデーションを制作
 - クロージャーを使用するパターンで試してみる
 ```php:
 // ContactInputPost.php
@@ -361,6 +361,40 @@ public function rules()
 - ここまでで紹介したやり方は`|`記法が使えない
   - `'tel' => 'required|max:15|not_regex:/[^0-9]/',` ←のようなことができない
   - `'name' => 'required|new Kana()` みたいなことはできない 
+- 「ひらがな」のみみたいな検証ルールはどこでも使用できるほうが何度も書かなくてすみそう
+- また、`|`記法を使用できるようにもしたい
+- なので、**サービスプロバイダーに登録**してみる
+- `php artisan make:provider KanaServiceProvider` でサービスプロバイダを作成する
+```php:
+use Illuminate\Support\Facades\Validator;
+class KanaServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        Validator::extend('kana', function ($attr, $value, $parameters, $validator) {
+            return preg_match('/[^ぁ-んー]/u', $value) === 0;
+        });
+    }
+}
+```
+- 上記の用意ができたら、`config/app.php`の`providers`にクラスを登録して完了
+- 使用する場合は、以下のような感じでOK
+```php:
+    public function rules()
+    {
+        return [
+            // 配列でもかける
+            // 'name' => [
+            //     'required','kana'
+            // ],
+            'name' => 'required|kana',
+        ];
+    }
+    public function messages(){
+        return [
+            'kana' => 'かなはひらがなで入力してください',
+            'name.required' => '名前は必須です',
+```
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
@@ -379,4 +413,47 @@ public function rules()
 @php
     dd();
 @endphp
+```
+
+### (復習) ServiceContainerとServiceProvider
+- [ServiceContainerとServiceProviderの関係性](https://www.geekfeed.co.jp/geekblog/laravel-service-providers)
+- ブートストラップ：初期化。Laravelのコア機能。依存関係やServiceContainerのルート登録とかやっている.リクエスト来るたびに`config/app.php`の`providers`に登録されたものを初期化して必要なアイテムを用意しておくイメージ。
+- サービスコンテナ：アプリのブートストラップ処理で開始された全てのものが配置される Key=>Value の「場所」。「Auto resolving / Dependency injectionなど」などの強力な機能を搭載。ものをサービスコンテナに**バインド(配置)**して、サービスコンテナから**解決(取得)**している。
+```php:
+    // 配置
+    app()->bind('example', function(){  
+        return 'hello world';
+    });
+    // 解決
+    app()->make('example'); // [出力] hello world
+```
+- サービスプロバイダー：サービスコンテナにものをバインドするために使用される。主要なメソッド「register/boot」がある。
+- Laravelにリクエストが来ると、まずブートストラップが開始、登録済みサービスプロバイダの全てのregisterメソッドを呼び出し、次にbootメソッドを呼び出す。
+- つまり、サービスプロバイダーの register メソッドを使用してサービスコンテナーに何かをバインドしていた場合、システムのブートストラップ後にすべてを使用できる。
+-  プロジェクト内のどこからでもコンテナからこれらのものを使用できる
+- [ServiceProviderのbootとregisterメソッド](https://blog.fagai.net/2015/04/12/laravel-serviceprovider-boot-register/)
+  - 大抵は、bootメソッドに記述するだけで事足りる。他のServiceProviderでregisterしておかないといけない時とかに、registerは使うようだ。
+- Deferredサービスプロバイダ：実は、サービスプロバイダはリクエストのタイミングで全てが呼び出されるわけでは無いらしい。Deferredとは、サービスプロバイダーがすべてのリクエストに対してロードされるのではなく、特にそのプロバイダーがリクエストされた場合にのみロードされることを意味する。
+  - **サービスプロバイダーは、コンテナにバインディングを登録している場合にのみ「Deferred」にすることができる**
+  - **bootメソッドに何かがある場合、そのサービスプロバイダーはDeferredにすることができない**
+- Deferredサービスプロバイダーは DeferrableProvider インターフェイスと provides メソッドを使用する。
+- Deferredの簡易的な例
+```php:
+namespace App\Providers;
+ 
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use App\Sample;
+class SampleServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register() { 
+        $this->app->bind(Sample::class, function($app){
+            return new Sample();
+        });
+    }
+    public function provides()
+    {
+        return [Sample::class];
+    }
+}
 ```

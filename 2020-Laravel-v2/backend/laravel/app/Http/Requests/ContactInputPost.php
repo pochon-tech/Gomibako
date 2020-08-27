@@ -25,8 +25,20 @@ class ContactInputPost extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'mail' => ['required', Rule::unique('contacts')->ignore($this->id)],
+            'name' => [
+                'required',
+                function ($attr, $value, $fail) {
+                    // dump($attr, $value, $fail); // name, 値, Closure($message)
+                    if (preg_match('/[^ぁ-んー]/u', $value) !== 0)
+                    {
+                        return $fail('ひらがなで入力してください');
+                    }
+                }
+            ],
+            'mail' => [
+                'required',
+                Rule::unique('contacts')->ignore($this->id)
+            ],
             'tel' => 'required|max:15|not_regex:/[^0-9]/',
             'contents' => 'required',
         ];

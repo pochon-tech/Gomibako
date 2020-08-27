@@ -313,6 +313,29 @@
   - 現在のIDを無視する一意のルールを追加 `'mail' => ['required', Rule::unique('contacts')->ignore($this->id)],`
   - storeメソッドと同じようにupdateメソッドでフォームリクエストを引数に渡す
 
+### 独自のバリデーションを追加してみた
+- 試しに名前は「ひらがな」のみしか許可しないようなバリデーションを追加してみた。
+- クロージャーを使用するパターンで試してみる
+```php:
+// ContactInputPost.php
+public function rules()
+{
+    return [
+        'name' => [
+            'required',
+            // クロージャーを使用したパターン
+            function ($attr, $value, $fail) {
+                // dump($attr, $value, $fail); // name, 値, Closure($message)
+                if (preg_match('/[^ぁ-んー]/u', $value) !== 0)
+                {
+                    return $fail('ひらがなで入力してください');
+                }
+            }
+        ],
+```
+- Ruleオブジェクトを使用するパターンでも試してみる
+
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)

@@ -23,7 +23,7 @@
     </div>
 @endif
    
-<form action="{{ route('contacts.store') }}" method="POST">
+<form action="{{ route('contacts.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
      <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
@@ -52,8 +52,8 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>file_path:</strong>
-                <input type="text" name="file_path" class="form-control" placeholder="file_path" value="{{ old('file_path') }}">
+                <strong>file_path:</strong>        
+                <input type="file" name="file_path" class="form-control" placeholder="file_path">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

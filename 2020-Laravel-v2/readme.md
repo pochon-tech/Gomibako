@@ -396,6 +396,45 @@ class KanaServiceProvider extends ServiceProvider
             'name.required' => '名前は必須です',
 ```
 
+### File Upload機能を実装してみる
+- 以前、Contactテーブルに「file_path」というカラムを用意したが、１つの問合せに対して複数のファイルをアップするときの保存先に困るので、テーブル設計を変更する
+- ということで、`php artisan make:migration update_contacts_table --table=contacts` で再度マイグレーションファイルを作成を試みたが、エラーになる
+- マイグレーションファイルは、クラスであるため、重複してしまうとエラーになってしまうのだ
+  - [何度もマイグレーションファイル作るときに命名決める](https://qiita.com/naoqoo2/items/91ca0a8db2401059e56c)
+  - `php artisan make:migration modify_contacts_20160128 --table=contacts`
+  - ひとまず、クラス名の重複はこれで解決するので、下記のようにカラムを削除するマイグレーションを実装してから `php artisan migrate`
+```php:
+class ModifyContacts20160128 extends Migration
+{
+    public function up()
+    {
+        Schema::table('contacts', function (Blueprint $table) {
+            // ファイルパスは別テーブルに変更
+            $table->dropColumn('file_path');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('contacts', function (Blueprint $table) {
+            $table->string('file_path');
+        });
+    }
+}
+```
+- 続いて、ファイル管理用のテーブルを作成する
+- `php artisan make:model -m Attachment` を実行して、以下のようなテーブル定義で試してみる
+```php:
+    Schema::create('attachments', function (Blueprint $table) {
+        $table->id();
+        $table->integer('parent_id'); // 各テーブルのID (ContactテーブルのIDとか)
+        $table->string('model')->comment('model-name'); // 各モデル名 (App\Contact)
+        $table->string('path')->comment('file-path');  // ファイルのパス
+        $table->string('key')->comment('key'); // 何のファイルかをグループ化するキー（profile_photosなど）
+        $table->timestamps();
+    });
+```
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)
@@ -457,3 +496,13 @@ class SampleServiceProvider extends ServiceProvider implements DeferrableProvide
     }
 }
 ```
+
+### 画像ってDBに保存するべきでない？
+- MysqlではBLOB型にすれば、画像データを保存することができる
+- そのまま保存することは良いことなのだろうか？
+- 実を言うと、[あまりおすすめはされないようである](https://teratail.com/questions/81233)
+  - 1レコードのデータ量が多くなり、クエリに時間がかかるようだ
+    - 例えば、4kbの画像データでも、DBにとっては結構な負担のようだ
+  - また、単純にストレージ容量が圧迫してしまう
+    - そもそも、画像データ自体は、オブジェクトストレージ（S3とか）を活用していったほうがよい
+  - WebとDBを分割する際に、ファイルパスなどで弊害がでてしまうようだ

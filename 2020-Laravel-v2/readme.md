@@ -506,3 +506,198 @@ class SampleServiceProvider extends ServiceProvider implements DeferrableProvide
   - また、単純にストレージ容量が圧迫してしまう
     - そもそも、画像データ自体は、オブジェクトストレージ（S3とか）を活用していったほうがよい
   - WebとDBを分割する際に、ファイルパスなどで弊害がでてしまうようだ
+
+### (復習) リレーションシップ
+- LaravelのORMのリレーションシップについての[おさらい](https://www.ritolab.com/entry/122)する
+- **hasOne :** 1対1の関係。親テーブルとそれを補う子テーブルからデータを取得。リレーションの定義は下記。
+```php:
+class User extends Model
+{
+    // 「１対１」→ メソッド名は単数形
+    public function phone()
+    {
+        // 子モデルの（Phone）データを引っ張てくる 
+        // 暗黙的に、親usersテーブルのidと子phonesテーブルのuser_idを紐づけている
+        return $this->hasOne('App\Phone');
+        // 子モデルの外部キーを変更したい場合
+        // return $this->hasOne('App\Phone', 'foreign_key');
+        // 親モデル (User) の主キーと子モデル (Phone)の外部キーを変更したい場合
+        // return $this->hasOne('App\Phone', 'foreign_key', 'local_key');
+    } 
+}
+// 使用する場合
+App\User::find(8)->name; // Userテーブルのnameカラムを引っ張る
+App\User::find(8)->phone->number; // Phoneテーブルのnumberカラムを引っ張る
+```
+- 上記の定義により、UserテーブルからPhoneテーブルの情報を取得できる。
+- **belongsTo :** hasOneの逆。つまり、PhoneテーブルからUserテーブルの情報を取得。リレーションの定義は下記。
+```php:
+class Phone extends Model
+{
+    public function user()
+    {
+        // 親モデル（User）データを引っ張ってくる
+        // 暗黙的に、子phonesテーブルのuser_idと親usersテーブルのidを紐づけている
+        return $this->belongsTo('App\User');
+        // 子モデル (Phone) の外部キーを変更したい場合
+        // return $this->belongsTo('App\User', 'foreign_key');
+        // 親モデル (User) の主キーと子モデル (Phone) の外部キーを変更したい場合
+        // return $this->hasOne('App\User', 'foreign_key', 'own_key_name');
+    }
+}
+// 使用する場合
+App\Phone::find(8)->number; // phonesテーブルのnumberカラムを引っ張る
+App\Phone::find(8)-user->name; // usersテーブルのnameカラムを引っ張る
+```
+- **hasMany :** 1対多。例えば、usersテーブルとcommentsテーブルがあり、ユーザ一人が複数のコメントを行うような関係。リレーションの定義は下記。
+```php:
+class User extends Model
+{
+    public function comments()
+    {
+        // 暗黙的にusersテーブルのidとcommentsテーブルのuser_idを結合
+        return $this->hasMany('App\Comment');
+        // 外部キーとローカルキーを変更する場合
+        // return $this->hasMany('App\Comment', 'foreign_key', 'local_key');
+    } 
+}
+// 使用する場合
+App\User::find(8)->name; // Userテーブルのnameカラムを引っ張る
+// commentsテーブルの id, comment, created_at カラムの配列
+App\User::find(8)->comments->select('id', 'comment', 'created_at')->get()->toArray(); 
+```
+- **belongsTo :** 多対1。hasManyの逆。commentsテーブルからusersテーブルの情報を取得したいときに使用。[複数のテーブルに対して多対一で紐づくテーブルの設計アプローチ](https://spice-factory.co.jp/development/has-and-belongs-to-many-table/)
+```php:
+class Comment extends Model
+{
+    public function user()
+    {
+        // 暗黙的にusersテーブルのidとcommentsテーブルのuser_idを結合
+        return $this->belongsTo('App\User');
+    } 
+}
+// 使用する場合
+App\Comment::find(8)->comment; // Commentsテーブルのcommentカラムを引っ張る
+App\Comment::find(8)->user->name; // Userテーブルのnameカラムを引っ張る
+```
+- **belongsToMany :** 多対多。多対多とは、互いのテーブルにおいて、それぞれが、それぞれ複数の対象を持つ場合の結合関係。
+- 例えば、ブログ記事とそれに設定するタグの関係。記事は、それぞれいくつでも好きなだけタグを設定でき、タグは、複数の記事に設定されるような関係。この場合、**記事テーブルのタグIDカラムには複数のタグIDを入れる必要があり**、同じくタグテーブルにも、**１つのタグレコードの記事IDカラムには複数の記事IDを入れる必要がある**。これらは、「中間テーブル」を用意することで、多対多の関係を構築できる。
+```sql:
+// 記事テーブル
+mysql> SHOW COLUMNS FROM `posts`;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| id         | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| member_id  | int(10) unsigned | NO   | MUL | NULL    |                |
+| post       | text             | NO   |     | NULL    |                |
+| created_at | timestamp        | YES  |     | NULL    |                |
+| updated_at | timestamp        | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+
+// タグテーブル
+mysql> SHOW COLUMNS FROM `tags`;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| id         | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| tag        | varchar(255)     | NO   |     | NULL    |                |
+| created_at | timestamp        | YES  |     | NULL    |                |
+| updated_at | timestamp        | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+
+// 中間テーブル (多対多の実現)
+mysql> SHOW COLUMNS FROM `post_tag`;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| id         | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| post_id    | int(10) unsigned | NO   |     | NULL    |                |
+| tag_id     | int(10) unsigned | NO   |     | NULL    |                |
+| created_at | timestamp        | YES  |     | NULL    |                |
+| updated_at | timestamp        | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+```
+- 上記を見れば分かりやすいが、中間テーブルには、**記事IDカラムとタグIDカラムを持ち、記事テーブルとタグテーブルを結びつける能力を持つ**。
+- この「多対多」のリレーションを行うには、モデルで`belongsToMany()`メソッドを定義する。
+```php:
+class Post extends Model
+{
+    public function tags()
+    {
+        return $this->belongsToMany('App\Tag');
+    }
+}
+```
+- 上記の定義により、以下が暗黙のルールとして処理が行われる
+  - postsテーブルとtagsテーブルのリレーションである
+  - 中間テーブルにpost_tagテーブルを使う
+  - postsテーブルのidとpost_tagテーブルのpost_idが結合する
+  - tagsテーブルのidとpost_tagテーブルのtag_idが結合する
+- もし、テーブルの設計が上記の暗黙のルールにしたがっていない場合は以下のように置き換えできる
+```php:
+return $this->belongsToMany(
+    'App\Tag',                   // さっきと同じ。タグのModel。
+    'pivotTable(=post_tag)',     // 中間テーブル名
+    'foreignPivotKey(=post_id)', // 中間テーブルにあるFK
+    'relatedPivotKey(=tag_id)'   // リレーション先モデルのFK
+);
+```
+- データを取得する場合は、以下のような記述でいける
+```php:
+    $posts = Post::all();
+    $data = [];
+    foreach ($posts as $post) {
+        $data[] = [
+            // postsテーブル
+            'id' => $post->id,
+            'post' => $post->post,
+            // tagsテーブル（タグ名のみを抽出）
+            'tags' => Arr::pluck($post->tags()->select('tag')->get()->toArray(), 'tag')
+        ];
+    }
+    // print_r($data);
+    // => Array
+    //(
+    //    [0] => Array
+    //        (
+    //            [id] => 1
+    //            [post] => post 01
+    //            [tags] => Array
+    //                (
+    //                    [0] => dolores
+    //                    [1] => incidunt
+    //                )
+    //        )
+```
+- ちなみに、逆でもいける。タグテーブルから記事テーブルの情報を取得する場合は以下でいける。
+```php:
+class Tag extends Model
+{
+    public function posts()
+    {
+        return $this->belongsToMany('App\Post');
+    }
+}
+// 使う場合
+$tags = Tag::all();
+$data = [];
+foreach ($tags as $tag) {
+    $data[] = [
+        // tagsテーブル
+        'id' => $tag->id,
+        'tag' => $tag->tag,
+        // postsテーブル（postのみ抽出）
+        'post' => $tag->post()->select('post')->first()->post
+    ];
+}
+// print_r($data);
+// => Array
+//(
+//    [0] => Array
+//        (
+//            [id] => 1
+//            [tag] => dolores
+//            [post] => post 01
+//        )
+```

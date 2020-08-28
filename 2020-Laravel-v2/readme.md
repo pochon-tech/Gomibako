@@ -434,6 +434,43 @@ class ModifyContacts20160128 extends Migration
         $table->timestamps();
     });
 ```
+- 続いて、Controller側で「お問い合わせ」のデータ登録と、「ファイル」の登録を行う
+```php:
+    public function store(ContactInputPost $request)
+    {
+        // お問い合わせテーブルの保存
+        $res = Contact::create($request->all());
+
+        // 画像データの保存
+        if ($res && $request->hasFile('photos')) {
+            foreach($request->photos as $photo) {
+                // storage/app/attachments フォルダに保存
+                $path = $photo->store('attachments');
+                // crateは配列でいける https://laracasts.com/discuss/channels/eloquent/usercreate-return
+                Attachment::create([
+                    'parent_id' => $res->id,
+                    'model' => get_class($res),
+                    'path' => $path,
+                    'key' => 'photos'
+                ]);
+            }
+        }
+
+        return redirect()->route('contacts.index')->with('success','登録完了');
+    }
+```
+- `Attachment::create()`を使用しているので、Attachmentモデルの`fillable`の定義は忘れずに行う
+- 実際に登録が行えたかどうかは、下記のクエリで確認可能だ
+```mysql:
+mysql> select * from contacts left join attachments on contacts.id = attachments.parent_id;
++----+------+-------------+--------------------+-------------+---------------------+---------------------+------+-----------+-------------+----------------------------------------------------------+--------+---------------------+---------------------+
+| id | name | tel         | mail               | contents    | created_at          | updated_at          | id   | parent_id | model       | path                                                     | key    | created_at          | updated_at          |
++----+------+-------------+--------------------+-------------+---------------------+---------------------+------+-----------+-------------+----------------------------------------------------------+--------+---------------------+---------------------+
+| 20 | ??   | 111111      | WWWWW              | ??????????? | 2020-08-28 12:37:12 | 2020-08-28 12:37:12 |    1 |        20 | App\Contact | attachments/JMwxhedgu91xc1VJImPCtgK3l0tIQVlmJ0mF3meL.png | photos | 2020-08-28 12:37:12 | 2020-08-28 12:37:12 |
+| 19 | ??   | 111111      | W                  | ??????????? | 2020-08-28 12:32:17 | 2020-08-28 12:32:17 | NULL |      NULL | NULL        | NULL                                                     | NULL   | NULL                | NULL                |
++----+------+-------------+--------------------+-------------+---------------------+---------------------+------+-----------+-------------+----------------------------------------------------------+--------+---------------------+---------------------+
+6 rows in set (0.01 sec)
+```
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

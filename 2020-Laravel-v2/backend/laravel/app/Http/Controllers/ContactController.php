@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contact;
+use App\Attachment;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContactInputPost; 
 
@@ -37,7 +38,24 @@ class ContactController extends Controller
      */
     public function store(ContactInputPost $request)
     {
-        Contact::create($request->all());
+        // お問い合わせテーブルの保存
+        $res = Contact::create($request->all());
+
+        // 画像データの保存
+        if ($res && $request->hasFile('photos')) {
+            foreach($request->photos as $photo) {
+                // storage/app/attachments フォルダに保存
+                $path = $photo->store('attachments');
+                // crateは配列でいける https://laracasts.com/discuss/channels/eloquent/usercreate-return
+                Attachment::create([
+                    'parent_id' => $res->id,
+                    'model' => get_class($res),
+                    'path' => $path,
+                    'key' => 'photos'
+                ]);
+            }
+        }
+
         return redirect()->route('contacts.index')->with('success','登録完了');
     }
 

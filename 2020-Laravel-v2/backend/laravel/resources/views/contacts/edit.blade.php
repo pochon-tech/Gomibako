@@ -23,7 +23,7 @@
     </div>
 @endif
    
-<form action="{{ route('contacts.update',$contact->id) }}" method="POST">
+<form action="{{ route('contacts.update',$contact->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <input type="hidden" name="id" value="{{ $contact->id }}">
@@ -54,8 +54,12 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>file_path:</strong>
-                <input type="text" name="file_path" value="{{ old('contents', $contact->file_path) }}" class="form-control" placeholder="file_path">
+                <strong>File 1: </strong>        
+                <input type="file" name="photos[]" class="form-control">
+            </div>
+            <div class="form-group">
+                <strong>File 2: </strong>        
+                <input type="file" name="photos[]" class="form-control">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

@@ -90,7 +90,23 @@ class ContactController extends Controller
      */
     public function update(ContactInputPost $request, Contact $contact)
     {
-        $contact->update($request->all());
+        // お問い合わせテーブルの更新;
+        $res = $contact->update($request->all());
+        // 画像データの保存
+        if ($res && $request->hasFile('photos')) { 
+            // 更新がある場合は、既存の画像を削除する
+            foreach($contact->attachments as $attachment) $attachment->delete();
+            foreach($request->photos as $photo) {
+                $path = $photo->store('public/attachments');
+                Attachment::create([
+                    'parent_id' => $contact->id,
+                    'model' => get_class($contact),
+                    'path' => 'storage/attachments/'.basename($path),
+                    'key' => 'photos'
+                ]);
+            }
+        }
+
         return redirect()->route('contacts.index')->with('success','編集完了');
     }
 

@@ -535,7 +535,26 @@ $contacts = Contact::with('attachments')->latest('id')->paginate(3);
         'deleted' => ContactDeleted::class
     ];
 ```
-- 以上で、自動的に関連する attachments も関連ファイルも削除されることになる
+- 以上で、削除されたとき（$contact->delete()された時）自動的に関連する attachments も関連ファイルも削除されることになる
+
+### 編集画面でファイルを編集する場合はどうするか
+- 一番簡易的な方法として、ファイルのみ更新があったら既存のファイルを消してしまう方法である
+```php:
+    $res = $contact->update($request->all());
+    // 画像データの保存
+    if ($res && $request->hasFile('photos')) { 
+        foreach($contact->attachments as $attachment) $attachment->delete(); // 更新がある場合は、既存の画像を削除する
+        foreach($request->photos as $photo) {
+            $path = $photo->store('public/attachments');
+            Attachment::create([
+                'parent_id' => $contact->id,
+                'model' => get_class($contact),
+                'path' => 'storage/attachments/'.basename($path),
+                'key' => 'photos'
+            ]);
+        }
+    }
+```
 
 
 # 参考サイト

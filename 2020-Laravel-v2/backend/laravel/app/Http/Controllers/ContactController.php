@@ -16,7 +16,7 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $contacts = Contact::latest('id')->paginate(3);
+        $contacts = Contact::with('attachments')->latest('id')->paginate(3);
         return view('contacts.index', compact('contacts'))->with('i', (request()->input('page', 1) - 1) * 3);
     }
 
@@ -44,13 +44,13 @@ class ContactController extends Controller
         // 画像データの保存
         if ($res && $request->hasFile('photos')) {
             foreach($request->photos as $photo) {
-                // storage/app/attachments フォルダに保存
-                $path = $photo->store('attachments');
+                // storage/app/public/attachments フォルダに保存
+                $path = $photo->store('public/attachments');
                 // crateは配列でいける https://laracasts.com/discuss/channels/eloquent/usercreate-return
                 Attachment::create([
                     'parent_id' => $res->id,
                     'model' => get_class($res),
-                    'path' => $path,
+                    'path' => 'storage/attachments/'.basename($path),
                     'key' => 'photos'
                 ]);
             }

@@ -397,6 +397,7 @@ class KanaServiceProvider extends ServiceProvider
 ```
 
 ### File Upload機能を実装してみる
+- [参考サイト](https://blog.capilano-fw.com/)を頼りに、FileUpload機能を実装してみよう
 - 以前、Contactテーブルに「file_path」というカラムを用意したが、１つの問合せに対して複数のファイルをアップするときの保存先に困るので、テーブル設計を変更する
 - ということで、`php artisan make:migration update_contacts_table --table=contacts` で再度マイグレーションファイルを作成を試みたが、エラーになる
 - マイグレーションファイルは、クラスであるため、重複してしまうとエラーになってしまうのだ
@@ -444,13 +445,16 @@ class ModifyContacts20160128 extends Migration
         // 画像データの保存
         if ($res && $request->hasFile('photos')) {
             foreach($request->photos as $photo) {
-                // storage/app/attachments フォルダに保存
-                $path = $photo->store('attachments');
+                // 表示の実装のタイミングで再度述べるが、Webからのアクセスを許すには、public/storage から storage/app/public へシンボリックリンクを張る必要がある
+                // そして、storage/app/public 配下のフォルダに実ファイルを保存しておく必要がある
+                // https://readouble.com/laravel/7.x/ja/filesystem.html
+                $path = $photo->store('public/attachments');
                 // crateは配列でいける https://laracasts.com/discuss/channels/eloquent/usercreate-return
                 Attachment::create([
                     'parent_id' => $res->id,
                     'model' => get_class($res),
-                    'path' => $path,
+                    // Web上に公開している場合のURIが、domain/storage/xxxx になるので、公開Pathに合わせている
+                    'path' => 'storage/attachments/'.basename($path),
                     'key' => 'photos'
                 ]);
             }
@@ -471,12 +475,75 @@ mysql> select * from contacts left join attachments on contacts.id = attachments
 +----+------+-------------+--------------------+-------------+---------------------+---------------------+------+-----------+-------------+----------------------------------------------------------+--------+---------------------+---------------------+
 6 rows in set (0.01 sec)
 ```
+- 続いて、Contact情報を取得する際にAttachmentの情報も一緒に取得して、一覧で画像を表示してみる
+- まずは、ContactモデルにAttchmentとのリレーション（1対多のhasMany)を定義する
+```php:
+    // リレーションシップ
+    public function attachments() {
+
+        // attachmentsテーブルは他のモデルともリレーションを持つことを想定して、modelカラム用意している
+        // 今回は、「attachments.parent_id」＝「contacts.id」、「attachments.model」＝「App\Contact」
+        return $this->hasMany("'App\Attachment'", "parent_id", "id")
+            ->where('model', self::class);  // 「App\Contact」のものだけ取得
+    }
+```
+- リレーションシップの定義が終わったら、続いて Eloquentのwith関数 を用いて子テーブルから一覧を取得する処理をController側に記述する
+- [with関数について](https://www.yoheim.net/blog.php?q=20181104)
+```php:
+$contacts = Contact::with('attachments')->latest('id')->paginate(3);
+```
+- View側では以下のような記述でatttchmentsにアクセスできる
+```html:
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Name</th>
+            <th>file</th>
+        </tr>
+        @foreach ($contacts as $contact)
+        <tr>
+            <td>{{ $contact->name }}</td>
+            <td>
+                @foreach ($contact->attachments as $attachment)
+                    {{ $attachment->path }} 
+                @endforeach
+            </td>
+```
+- パスの表示が確認できたところで、画像の表示も行ってみる
+- まず、実ファイルはstorageディレクトリに格納されているので、ドキュメントルートからのシンボリックリンクを作っておく (`php artisan storage:link`)
+```html:
+    @foreach ($contact->attachments as $attachment)
+        <img src="{{ asset($attachment->path) }}" width="150px" />
+    @endforeach
+```
+- assetヘルパはpublicディレクトリのパスを返す関数
+- ついでに、対象のContactのデータが削除されたら、実ファイルも削除する処理を実装する
+- `php artisan make:event ContactDeleted` で削除イベントクラスを作成する
+```php:
+    public function __construct(Contact $contact)
+    {
+        foreach($contact->attachments as $attachment) {
+
+            \Storage::delete('public/attachments/'.basename($attachment->path)); // 実ファイル削除
+            $attachment->delete(); // attachments 上のデータ削除
+        }
+    }
+```
+- Contactモデルに下記を追加
+```php:
+    protected $dispatchesEvents = [
+        'deleted' => ContactDeleted::class
+    ];
+```
+- 以上で、自動的に関連する attachments も関連ファイルも削除されることになる
+
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)
 - [Laravel命名規則](https://qiita.com/gone0021/items/e248c8b0ed3a9e6dbdee)
 - [Laravelベストプラクティス](https://webty.jp/staffblog/production/post-1835/)
+- [Laravelコレクションの実例](https://blog.capilano-fw.com/?p=727#dump)
 
 # VSCODE拡張
 - PHP Intelephense: PHPのコード補完、参照の検索や定義への移動などなど

@@ -27,6 +27,7 @@
             <th>Mail</th>
             <th>Tel</th>
             <th>Contents</th>
+            <th>file</th>
             <th width="280px">Action</th>
         </tr>
         @foreach ($contacts as $contact)
@@ -36,6 +37,11 @@
             <td>{{ $contact->mail }}</td>
             <td>{{ $contact->tel }}</td>
             <td>{{ $contact->contents }}</td>
+            <td>
+                @foreach ($contact->attachments as $attachment)
+                    <img src="{{ asset($attachment->path) }}" width="150px" />
+                @endforeach
+            </td>
             <td>
                 <form action="{{ route('contacts.destroy',$contact->id) }}" method="POST">
    

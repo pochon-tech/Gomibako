@@ -54,12 +54,8 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>File 1: </strong>        
-                <input type="file" name="photos[]" class="form-control">
-            </div>
-            <div class="form-group">
-                <strong>File 2: </strong>        
-                <input type="file" name="photos[]" class="form-control">
+                <strong>File: </strong>        
+                <input type="file" name="photos[]" class="form-control" multiple="multiple">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">

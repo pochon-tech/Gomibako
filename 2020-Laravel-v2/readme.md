@@ -556,6 +556,15 @@ $contacts = Contact::with('attachments')->latest('id')->paginate(3);
     }
 ```
 
+### multiple属性というのを初めて知った
+- [夢の複数ファイルをアップロード](https://kazumich.com/html5multiple.html)という記事をみたら夢のようだった
+```html:
+    <div class="form-group">
+        <strong>File: </strong>        
+        <input type="file" name="photos[]" class="form-control" multiple="multiple">
+    </div>
+```
+- 配列で複数ファイルを渡せた
 
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)

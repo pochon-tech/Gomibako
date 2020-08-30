@@ -10,6 +10,7 @@
             </div>
             <div class="pull-right">
                 <a class="btn btn-success" href="{{ route('contacts.create') }}"> 新規作成</a>
+                <a class="btn btn-success" href="{{ route('contacts.download') }}"> CSVDL</a>
             </div>
         </div>
     </div>

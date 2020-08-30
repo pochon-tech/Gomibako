@@ -566,6 +566,48 @@ $contacts = Contact::with('attachments')->latest('id')->paginate(3);
 ```
 - 配列で複数ファイルを渡せた
 
+### CSVDLを実装してみる
+- 一覧画面にCSVDLボタンを追加して、一覧をダウンロードしてみる
+- CSVダウンロードのルーティング定義を行う
+```php:
+Route::get('contacts/download', 'ContactController@download')->name('contacts.download');  // 追加
+Route::resource('contacts', 'ContactController');
+```
+- [ルーティングにおける優先順位の問題](https://qiita.com/u-dai/items/966673ae1eb6c2613da8)でつまづいたので注意
+- 続いて、コントローラに[CSV出力](https://blog.hrendoh.com/laravel-6-download-csv-with-streamdownload/)の実装を行う
+- ちなみに、CSV出力時における出力バッファの制御やストリームフィルターについて[ここ](http://lab.flama.co.jp/archives/1139/)が非常に参考になった
+```php:
+public function download(Request $request)
+    {
+        return response()->streamDownload(function(){
+            $stream = fopen('php://output', 'w'); // 出力バッファOpen
+            stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT'); // 文字コードをShift-JISに変換
+            // CSVのヘッダを用意
+            fputcsv($stream, [
+                'id',
+                'name',
+                'tel',
+                'mail',
+                'contents'
+            ]);
+            // CSVのボディ（データ）を用意
+            foreach (Contact::cursor() as $contact) {
+                fputcsv($stream, [
+                    $contact->id,
+                    $contact->name,
+                    $contact->tel,
+                    $contact->mail,
+                    $contact->contents
+                ]);
+            }
+            fclose($stream); // 出力バッファClose
+        }, 'contacts.csv', [ 'Content-Type' => 'application/octet-stream' ]);
+    }
+```
+- `response()->streamDownload` は、Laravelが用意している大容量のファイルをストリームで帰す場合のメソッドであり、Responseファサードまたはresponse()ヘルパー関数で返される（Illuminate\Routing\ResponseFactory) に定義されてるので、`\Response::streamDownload()` でも構わない
+- `cursor()` は、Eloquentが用意している、大量のデータを取得する際にメモリ使用量を抑えるための関数
+- [cursorの検証](https://qiita.com/ryo511/items/ebcd1c1b2ad5addc5c9d)とかも参考にすると良い
+
 # 参考サイト
 - [MarkDown記法](https://notepm.jp/help/how-to-markdown)
 - [VSCODEショートカット](https://qiita.com/naru0504/items/99495c4482cd158ddca8)
@@ -585,6 +627,16 @@ $contacts = Contact::with('attachments')->latest('id')->paginate(3);
     dd();
 @endphp
 ```
+
+- SQLをデバッグしたい
+```php:
+    \DB::enableQueryLog();
+    foreach (Contact::cursor() as $contact) {
+        var_dump($contact->id);
+    }
+    dd(\DB::getQueryLog());
+```
+
 
 ### (復習) ServiceContainerとServiceProvider
 - [ServiceContainerとServiceProviderの関係性](https://www.geekfeed.co.jp/geekblog/laravel-service-providers)

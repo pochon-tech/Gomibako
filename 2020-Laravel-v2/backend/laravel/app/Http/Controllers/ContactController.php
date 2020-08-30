@@ -121,4 +121,40 @@ class ContactController extends Controller
         $contact->delete();
         return redirect()->route('contacts.index')->with('success','削除完了しました');
     }
+
+    /**
+     * 
+     */
+    public function download(Request $request)
+    {
+
+        // \DB::enableQueryLog();
+        // foreach (Contact::cursor() as $contact) {
+        //     var_dump($contact->id);
+        // }
+        // dd(\DB::getQueryLog());
+        return response()->streamDownload(function(){
+            $stream = fopen('php://output', 'w'); // 出力バッファOpen
+            stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT'); // 文字コードをShift-JISに変換
+            // CSVのヘッダを用意
+            fputcsv($stream, [
+                'id',
+                'name',
+                'tel',
+                'mail',
+                'contents'
+            ]);
+            // CSVのボディ（データ）を用意
+            foreach (Contact::cursor() as $contact) {
+                fputcsv($stream, [
+                    $contact->id,
+                    $contact->name,
+                    $contact->tel,
+                    $contact->mail,
+                    $contact->contents
+                ]);
+            }
+            fclose($stream); // 出力バッファClose
+        }, 'contacts.csv', [ 'Content-Type' => 'application/octet-stream' ]);
+    }
 }

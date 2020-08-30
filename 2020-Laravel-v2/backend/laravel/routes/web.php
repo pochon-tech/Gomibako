@@ -17,4 +17,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('contacts/download', 'ContactController@download')->name('contacts.download');
 Route::resource('contacts', 'ContactController');
